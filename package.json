@@ -99,13 +99,14 @@
     ],
     "publish": {
       "provider": "github",
-      "url": "git@github.com:DamieUk/jbbf-agent-releases.git",
+      "owner": "DamieUk",
+      "repo": "jbbf-agent-releases",
       "private": false
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://git.jbbf.ch/jbbf/jbbf-automation-agent.git"
+    "url": "https://github.com/DamieUk/jbbf-agent-releases.git"
   },
   "author": {
     "name": "Electron React Boilerplate Maintainers",
