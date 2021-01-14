@@ -27,7 +27,8 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 autoUpdater.setFeedURL({
   provider: 'github',
-  url: 'git@github.com:DamieUk/jbbf-agent-releases.git',
+  owner: 'DamieUk',
+  repo: 'jbbf-agent-releases',
 });
 
 function sendStatusLogs(message: string) {
