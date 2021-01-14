@@ -11,68 +11,70 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { app } from 'electron';
-import { autoUpdater } from 'electron-updater';
+// import { autoUpdater } from 'electron-updater';
+import autoUpdater from 'update-electron-app';
 import { SocketEvents } from './sockets/constants';
 import socket from './sockets/socketInstance';
 import * as evenCallbacks from './sockets/eventCallbacks';
 
 import logger from './utils/logger';
 
-autoUpdater.requestHeaders = { 'PRIVATE-TOKEN': 'DR_tmZ9yztmfxQWWtXjn' };
-autoUpdater.autoDownload = true;
-autoUpdater.logger = logger;
-autoUpdater.autoInstallOnAppQuit = true;
+// autoUpdater.requestHeaders = { 'PRIVATE-TOKEN': 'DR_tmZ9yztmfxQWWtXjn' };
+// autoUpdater.autoDownload = true;
+// autoUpdater.logger = logger;
+// autoUpdater.autoInstallOnAppQuit = true;
 
 // 'https://git.jbbf.ch/jbbf/jbbf-automation-agent/-/jobs/artifacts/master/raw/dist?job=build';
 
-autoUpdater.setFeedURL({
-  provider: 'github',
-  owner: 'DamieUk',
-  repo: 'jbbf-agent-releases',
+autoUpdater({
+  repo: 'DamieUk/jbbf-agent-releases',
+  updateInterval: '5 minutes',
+  logger,
+  notifyUser: true,
 });
-
-function sendStatusLogs(message: string) {
-  logger.info(message);
-}
-
-autoUpdater.on('checking-for-update', () => {
-  sendStatusLogs('Checking for update...');
-});
-
-autoUpdater.on('update-available', () => {
-  sendStatusLogs('Update available.');
-});
-
-autoUpdater.on('update-not-available', () => {
-  sendStatusLogs('Update not available.');
-});
-
-autoUpdater.on('error', () => {
-  sendStatusLogs('Error in auto-updater.');
-});
-
-autoUpdater.on('download-progress', (progressObj) => {
-  let logMessage = `Download speed: ${progressObj.bytesPerSecond}`;
-  logMessage = `${logMessage} - Downloaded ${parseInt(
-    progressObj.percent,
-    10
-  )}%`;
-  logMessage = `${logMessage} (${progressObj.transferred}/${progressObj.total})`;
-  sendStatusLogs(logMessage);
-});
-
-autoUpdater.on('update-downloaded', () => {
-  setTimeout(() => {
-    autoUpdater.quitAndInstall();
-  }, 1000);
-});
-
-autoUpdater.checkForUpdates();
+//
+// function sendStatusLogs(message: string) {
+//   logger.info(message);
+// }
+//
+// autoUpdater.on('checking-for-update', () => {
+//   sendStatusLogs('Checking for update...');
+// });
+//
+// autoUpdater.on('update-available', () => {
+//   sendStatusLogs('Update available.');
+// });
+//
+// autoUpdater.on('update-not-available', () => {
+//   sendStatusLogs('Update not available.');
+// });
+//
+// autoUpdater.on('error', () => {
+//   sendStatusLogs('Error in auto-updater.');
+// });
+//
+// autoUpdater.on('download-progress', (progressObj) => {
+//   let logMessage = `Download speed: ${progressObj.bytesPerSecond}`;
+//   logMessage = `${logMessage} - Downloaded ${parseInt(
+//     progressObj.percent,
+//     10
+//   )}%`;
+//   logMessage = `${logMessage} (${progressObj.transferred}/${progressObj.total})`;
+//   sendStatusLogs(logMessage);
+// });
+//
+// autoUpdater.on('update-downloaded', () => {
+//   setTimeout(() => {
+//     autoUpdater.quitAndInstall();
+//   }, 1000);
+// });
 
 let isAppRunning = false;
 
 const initWeSockets = async () => {
   if (!isAppRunning) isAppRunning = true;
+
+  // autoUpdater.checkForUpdates();
 
   logger.info('Starting app...');
   logger.info(`App Version: ${app.getVersion()}`);
@@ -82,7 +84,6 @@ const initWeSockets = async () => {
   socket.on(SocketEvents.connectError, logger.error);
   socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
 
-  logger.info('AutoUpdater is on.');
   logger.info(
     'AutoLauncher is enabled. Agent will start automatically on system start.'
   );

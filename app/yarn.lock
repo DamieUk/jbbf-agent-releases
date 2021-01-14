@@ -112,6 +112,13 @@ debug@~3.1.0:
   dependencies:
     ms "2.0.0"
 
+electron-auto-update@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/electron-auto-update/-/electron-auto-update-1.2.2.tgz#626b87e11e434bf07c868ea7a7074e515b092be9"
+  integrity sha512-HVowqAW+W38wnwCcyMG3w4H0p0fBgyssuU9X/Sd9NLA9n1jXwkOdfLFSNZSXh6+0xmDL+kaNk82ONS2tiN96/A==
+  dependencies:
+    electron-updater "^4.3.5"
+
 electron-is-dev@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-0.3.0.tgz#14e6fda5c68e9e4ecbeff9ccf037cbd7c05c5afe"
