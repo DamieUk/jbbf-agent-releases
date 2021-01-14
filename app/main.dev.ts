@@ -86,6 +86,7 @@ const initWeSockets = async () => {
 
   logger.info('Starting app...');
   logger.info(`App Version: ${app.getVersion()}`);
+  logger.info(`this is new version of 0.0.8}`);
   logger.info('Connecting to websocket server...');
 
   socket.on(SocketEvents.connect, evenCallbacks.onConnect);
