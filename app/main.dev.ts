@@ -10,14 +10,25 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import { app } from 'electron';
+import { app, autoUpdater } from 'electron';
 // import { autoUpdater } from 'electron-updater';
-import autoUpdater from 'update-electron-app';
+// import autoUpdater from 'update-electron-app';
 import { SocketEvents } from './sockets/constants';
 import socket from './sockets/socketInstance';
 import * as evenCallbacks from './sockets/eventCallbacks';
 
 import logger from './utils/logger';
+
+const server = 'https://update.electronjs.org';
+const feed = `${server}/DamieUk/jbbf-agent-releases/${process.platform}-${
+  process.arch
+}/${app.getVersion()}`;
+
+autoUpdater.setFeedURL({
+  url: feed,
+});
+
+logger.info(`Feed url ->>>>> ${autoUpdater.getFeedURL()}`);
 
 // autoUpdater.requestHeaders = { 'PRIVATE-TOKEN': 'DR_tmZ9yztmfxQWWtXjn' };
 // autoUpdater.autoDownload = true;
@@ -26,12 +37,9 @@ import logger from './utils/logger';
 
 // 'https://git.jbbf.ch/jbbf/jbbf-automation-agent/-/jobs/artifacts/master/raw/dist?job=build';
 
-autoUpdater({
-  repo: 'DamieUk/jbbf-agent-releases',
-  updateInterval: '5 minutes',
-  logger,
-  notifyUser: true,
-});
+setInterval(() => {
+  autoUpdater.checkForUpdates();
+}, 60 * 1000);
 //
 // function sendStatusLogs(message: string) {
 //   logger.info(message);
