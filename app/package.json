@@ -1,7 +1,7 @@
 {
   "name": "jbbf-automation-agent",
   "productName": "JBBFAgent",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "JBBF agent for managing and executing platform scripts automatically",
   "main": "./main.prod.js",
   "scripts": {
