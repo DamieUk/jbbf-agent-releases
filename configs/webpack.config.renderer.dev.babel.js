@@ -50,7 +50,6 @@ export default merge(baseConfig, {
   entry: [
     'core-js',
     'regenerator-runtime/runtime',
-    ...(process.env.PLAIN_HMR ? [] : ['react-hot-loader/patch']),
     `webpack-dev-server/client?http://localhost:${port}/`,
     'webpack/hot/only-dev-server',
     require.resolve('../app/index.tsx'),
@@ -193,11 +192,6 @@ export default merge(baseConfig, {
         use: 'url-loader',
       },
     ],
-  },
-  resolve: {
-    alias: {
-      'react-dom': '@hot-loader/react-dom',
-    },
   },
   plugins: [
     requiredByDLLConfig

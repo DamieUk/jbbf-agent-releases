@@ -36,21 +36,6 @@
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe --live electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-watch": "yarn test --watch"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "cross-env NODE_ENV=development eslint --cache"
-    ],
-    "{*.json,.{babelrc,eslintrc,prettierrc,stylelintrc}}": [
-      "prettier --ignore-path .eslintignore --parser json --write"
-    ],
-    "*.{css,scss}": [
-      "stylelint --ignore-path .eslintignore --syntax scss --fix",
-      "prettier --ignore-path .eslintignore --single-quote --write"
-    ],
-    "*.{html,md,yml}": [
-      "prettier --ignore-path .eslintignore --single-quote --write"
-    ]
-  },
   "build": {
     "productName": "JBBFAgent",
     "appId": "org.develar.JBBFAgent",
@@ -146,27 +131,6 @@
     "hot",
     "reload"
   ],
-  "jest": {
-    "testURL": "http://localhost/",
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "app/node_modules"
-    ],
-    "setupFiles": [
-      "./internals/scripts/CheckBuildsExist.js"
-    ]
-  },
   "devDependencies": {
     "@amilajack/testcafe-browser-provider-electron": "^0.0.15-alpha.1",
     "@babel/core": "^7.11.5",
@@ -198,13 +162,6 @@
     "@types/history": "^4.7.7",
     "@types/jest": "^26.0.10",
     "@types/node": "12",
-    "@types/react": "^16.9.44",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-redux": "^7.1.9",
-    "@types/react-router": "^5.1.8",
-    "@types/react-router-dom": "^5.1.5",
-    "@types/react-test-renderer": "^16.9.3",
-    "@types/redux-logger": "^3.0.8",
     "@types/webpack": "^4.41.21",
     "@types/webpack-env": "^1.15.2",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
@@ -253,8 +210,6 @@
     "opencollective-postinstall": "^2.0.3",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "prettier": "^2.0.5",
-    "react-test-renderer": "^16.12.0",
-    "redux-logger": "^3.0.6",
     "rimraf": "^3.0.0",
     "sass-loader": "^9.0.3",
     "style-loader": "^1.2.1",
@@ -275,20 +230,11 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
-    "@hot-loader/react-dom": "^16.13.0",
     "@reduxjs/toolkit": "^1.4.0",
-    "connected-react-router": "^6.6.1",
     "electron-debug": "^3.1.0",
     "electron-log": "^4.2.4",
     "electron-updater": "^4.3.4",
     "history": "^4.7.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.12.0",
-    "react-hot-loader": "^4.12.21",
-    "react-redux": "^7.2.1",
-    "react-router-dom": "^5.2.0",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.5",
     "source-map-support": "^0.5.19",
     "update-electron-app": "^2.0.1"
@@ -299,22 +245,6 @@
     "yarn": ">=0.21.3"
   },
   "browserslist": [],
-  "prettier": {
-    "overrides": [
-      {
-        "files": [
-          ".prettierrc",
-          ".babelrc",
-          ".eslintrc",
-          ".stylelintrc"
-        ],
-        "options": {
-          "parser": "json"
-        }
-      }
-    ],
-    "singleQuote": true
-  },
   "stylelint": {
     "extends": [
       "stylelint-config-standard",
@@ -328,10 +258,5 @@
     "baseBranches": [
       "next"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

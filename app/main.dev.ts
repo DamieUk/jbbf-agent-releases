@@ -10,92 +10,37 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import { app, autoUpdater } from 'electron';
-// import { autoUpdater } from 'electron-updater';
-// import autoUpdater from 'update-electron-app';
+import {app} from 'electron';
+import autoUpdater from 'update-electron-app';
+import pac from '../package.json';
 import { SocketEvents } from './sockets/constants';
 import socket from './sockets/socketInstance';
 import * as evenCallbacks from './sockets/eventCallbacks';
+import { CurrentOS } from './enums';
+import InitApp from './actions/initApp';
+import setAppEnvs from './actions/setAppEnvs';
+import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
 
 import logger from './utils/logger';
 
-const server = 'https://update.electronjs.org';
-const feed = `${server}/DamieUk/jbbf-agent-releases/${process.platform}-${
-  process.arch
-}/${app.getVersion()}`;
-
-autoUpdater.setFeedURL({
-  url: feed,
+autoUpdater({
+  repo: 'DamieUk/jbbf-agent-releases',
+  updateInterval: '5 minutes',
+  logger
 });
 
-logger.info(`Feed url ->>>>> ${autoUpdater.getFeedURL()}`);
+logger.info(`Feed url ->>>>> DamieUk/jbbf-agent-releases`);
+app.setName(pac.productName);
 
-// autoUpdater.requestHeaders = { 'PRIVATE-TOKEN': 'DR_tmZ9yztmfxQWWtXjn' };
-// autoUpdater.autoDownload = true;
-// autoUpdater.logger = logger;
-// autoUpdater.autoInstallOnAppQuit = true;
-
-// 'https://git.jbbf.ch/jbbf/jbbf-automation-agent/-/jobs/artifacts/master/raw/dist?job=build';
-
-setInterval(() => {
-  autoUpdater.checkForUpdates();
-}, 60 * 1000);
-//
-// function sendStatusLogs(message: string) {
-//   logger.info(message);
-// }
-//
-// autoUpdater.on('checking-for-update', () => {
-//   sendStatusLogs('Checking for update...');
-// });
-//
-// autoUpdater.on('update-available', () => {
-//   sendStatusLogs('Update available.');
-// });
-//
-// autoUpdater.on('update-not-available', () => {
-//   sendStatusLogs('Update not available.');
-// });
-//
-// autoUpdater.on('error', () => {
-//   sendStatusLogs('Error in auto-updater.');
-// });
-//
-// autoUpdater.on('download-progress', (progressObj) => {
-//   let logMessage = `Download speed: ${progressObj.bytesPerSecond}`;
-//   logMessage = `${logMessage} - Downloaded ${parseInt(
-//     progressObj.percent,
-//     10
-//   )}%`;
-//   logMessage = `${logMessage} (${progressObj.transferred}/${progressObj.total})`;
-//   sendStatusLogs(logMessage);
-// });
-//
-// autoUpdater.on('update-downloaded', () => {
-//   setTimeout(() => {
-//     autoUpdater.quitAndInstall();
-//   }, 1000);
-// });
 
 let isAppRunning = false;
 
 const initWeSockets = async () => {
-  if (!isAppRunning) isAppRunning = true;
-
-  // autoUpdater.checkForUpdates();
-
-  logger.info('Starting app...');
-  logger.info(`App Version: ${app.getVersion()}`);
-  logger.info(`this is new version of 0.0.8}`);
   logger.info('Connecting to websocket server...');
 
   socket.on(SocketEvents.connect, evenCallbacks.onConnect);
   socket.on(SocketEvents.connectError, logger.error);
   socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
-
-  logger.info(
-    'AutoLauncher is enabled. Agent will start automatically on system start.'
-  );
 
   return socket;
 };
@@ -106,8 +51,20 @@ async function runApp() {
       openAsHidden: true,
     });
   }
-  if (!isAppRunning) await initWeSockets();
 
+  if (!isAppRunning) {
+    logger.info('Starting app...');
+    logger.info(`App Version: ${pac.version}`);
+
+    const ENV_VARS = await InitApp(app, CurrentOS);
+
+    logger.info(ENV_VARS);
+
+    await setAppEnvs(ENV_VARS);
+    await registerAgentWithVMWare(ENV_VARS);
+    await initWeSockets();
+  }
+  isAppRunning = true;
   return undefined;
 }
 

@@ -6,7 +6,6 @@ export function onConnect() {
   logger.info(
     `Websocket: Connect ->>>> Successfully connected to websocket server ws://jbbf-dev-socket.jbbf.ch!`
   );
-  logger.info('Websocket info: ', socket);
 }
 
 export function onRunTest() {

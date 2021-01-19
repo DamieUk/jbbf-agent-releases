@@ -7,6 +7,18 @@
   resolved "https://registry.yarnpkg.com/@types/auto-launch/-/auto-launch-5.0.1.tgz#388a047edc0e754d8e8978cbd9ed4672b36be2c4"
   integrity sha512-+KQ+/koZ7sJXnf5cnCANofY6yXAdYJNEoVZEuWcwJfuWbUp9u6l09I7KhwD+ivU+cdz7JId4V5ukxscWtHdSuw==
 
+"@types/node-forge@^0.9.6":
+  version "0.9.6"
+  resolved "https://registry.yarnpkg.com/@types/node-forge/-/node-forge-0.9.6.tgz#efd348f99778158a163bd7bb10fa60b2dc9d3bb9"
+  integrity sha512-lSy1BQxXQno8EzlCA9RATMzO6iIuBrlDrzB/GFC2yyObcLKDpwxY2YEivvSHdpLizeY9QLW7I4CadZx5ryV3bg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/node@*":
+  version "14.14.21"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.21.tgz#d934aacc22424fe9622ebf6857370c052eae464e"
+  integrity sha512-cHYfKsnwllYhjOzuC5q1VpguABBeecUp24yFluHpn/BQaVxB1CuQ1FSRZCzrPxrkIfWISXV2LbeoBthLWg0+0A==
+
 "@types/semver@^7.3.1":
   version "7.3.4"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.3.4.tgz#43d7168fec6fa0988bb1a513a697b29296721afb"
@@ -97,6 +109,11 @@ component-inherit@0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/component-inherit/-/component-inherit-0.0.3.tgz#645fc4adf58b72b649d5cae65135619db26ff143"
   integrity sha1-ZF/ErfWLcrZJ1crmUTVhnbJv8UM=
+
+curlrequest@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/curlrequest/-/curlrequest-1.0.1.tgz#cd3d8e04e81d7996b0a1cd9716cb09d50b41d50f"
+  integrity sha1-zT2OBOgdeZawoc2XFssJ1QtB1Q8=
 
 debug@^4.1.1:
   version "4.3.1"
@@ -279,6 +296,11 @@ ms@^2.1.1:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
+
+node-forge@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
+  integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==
 
 parseqs@0.0.6:
   version "0.0.6"
