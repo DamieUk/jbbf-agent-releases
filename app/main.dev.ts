@@ -11,6 +11,8 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app} from 'electron';
+import fs from 'fs';
+import path from 'path';
 import autoUpdater from 'update-electron-app';
 import pac from '../package.json';
 import { SocketEvents } from './sockets/constants';
@@ -22,12 +24,6 @@ import setAppEnvs from './actions/setAppEnvs';
 import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
 
 import logger from './utils/logger';
-
-autoUpdater({
-  repo: 'DamieUk/jbbf-agent-releases',
-  updateInterval: '5 minutes',
-  logger
-});
 
 logger.info(`Feed url ->>>>> DamieUk/jbbf-agent-releases`);
 app.setName(pac.productName);
@@ -46,6 +42,17 @@ const initWeSockets = async () => {
 };
 
 async function runApp() {
+  const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+  logger.info('isOnInstalledApp ->>>>> ', isOnInstalledApp)
+
+  if (isOnInstalledApp) {
+    autoUpdater({
+      repo: 'DamieUk/jbbf-agent-releases',
+      updateInterval: '5 minutes',
+      logger
+    });
+  }
+
   if (!isAppRunning && !app.getLoginItemSettings().wasOpenedAsHidden) {
     app.setLoginItemSettings({
       openAsHidden: true,
