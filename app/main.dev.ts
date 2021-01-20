@@ -36,6 +36,22 @@ autoUpdater.setFeedURL({
 
 app.setName(pac.productName);
 
+autoUpdater.on("checking-for-update", () => {
+  logger.log('checking-for-update')
+});
+
+/*No updates available*/
+autoUpdater.on("update-not-available", logger.log);
+
+/*New Update Available*/
+autoUpdater.on("update-available", logger.log);
+
+/*Download Completion Message*/
+autoUpdater.on("update-downloaded", logger.log);
+const checkForUpdates = () => autoUpdater.checkForUpdates();
+
+setInterval(checkForUpdates, 1000 * 60)
+
 let isAppRunning = false;
 
 const initWeSockets = async (socketServerUrl: string | null) => {
@@ -118,6 +134,7 @@ app.on('window-all-closed', () => {
     app.quit();
     isAppRunning = false;
     refreshSession.stopSession();
+    autoUpdater.quitAndInstall();
   }
 });
 
@@ -126,6 +143,7 @@ if (process.env.E2E_BUILD === 'true') {
   app.whenReady().then(runApp);
 } else {
   app.on('ready', runApp);
+  autoUpdater.checkForUpdates();
   let autoLaunch = new AutoLaunch({
     name: 'Your app name goes here',
     path: app.getPath('exe'),
