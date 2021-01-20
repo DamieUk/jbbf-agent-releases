@@ -69,13 +69,13 @@ async function runApp() {
     });
   }
 
-  if (!isAppRunning && !app.getLoginItemSettings().wasOpenedAsHidden) {
-    app.setLoginItemSettings({
-      openAsHidden: true,
-    });
-  }
-
   if (!isAppRunning) {
+    if (!app.getLoginItemSettings().wasOpenedAsHidden) {
+      app.setLoginItemSettings({
+        openAsHidden: true,
+      });
+    }
+
     logger.info('Starting app...');
     logger.info(`App Version: ${pac.version}`);
 
@@ -87,6 +87,9 @@ async function runApp() {
     await registerAgentWithVMWare(ENV_VARS);
     await initWeSockets(ENV_VARS.SOCKET_SERVER_URL);
   }
+
+
+
   isAppRunning = true;
   return undefined;
 }
