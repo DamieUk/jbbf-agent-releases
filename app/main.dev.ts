@@ -34,27 +34,34 @@ const AUTO_UPDATE_URL =
 
 const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
-autoUpdater.setFeedURL({
-  url: AUTO_UPDATE_URL,
-});
 
 app.setName(pac.productName);
 
-autoUpdater.on("checking-for-update", () => {
-  logger.log('checking-for-update')
-});
-
-/*No updates available*/
-autoUpdater.on("update-not-available", logger.log);
-
-/*New Update Available*/
-autoUpdater.on("update-available", logger.log);
-
-/*Download Completion Message*/
-autoUpdater.on("update-downloaded", logger.log);
-const checkForUpdates = () => autoUpdater.checkForUpdates();
-
 if (isOnInstalledApp) {
+  autoUpdater.setFeedURL({
+    url: AUTO_UPDATE_URL,
+  });
+
+  autoUpdater.on("checking-for-update", () => {
+    logger.log('checking-for-update')
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    logger.log('update-not-available')
+  });
+
+  const checkForUpdates = () => autoUpdater.checkForUpdates();
+
+  autoUpdater.on("update-available", (info: any) => {
+    logger.log('update-available..... quiting and restarting', info);
+    autoUpdater.quitAndInstall();
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    logger.log('update-downloaded');
+    autoUpdater.quitAndInstall();
+  });
+
   updateTimer = setInterval(checkForUpdates, 1000 * 60);
 }
 
@@ -152,9 +159,9 @@ if (process.env.E2E_BUILD === 'true') {
   app.whenReady().then(runApp);
 } else {
   app.on('ready', runApp);
-  autoUpdater.checkForUpdates();
+  if (isOnInstalledApp) autoUpdater.checkForUpdates();
   let autoLaunch = new AutoLaunch({
-    name: 'Your app name goes here',
+    name: pac.productName,
     path: app.getPath('exe'),
   });
   autoLaunch.isEnabled().then((isEnabled) => {
