@@ -10,10 +10,11 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import {app} from 'electron';
-import path from 'path';
-import fs from 'fs';
-import autoUpdater from 'update-electron-app';
+import {app, autoUpdater} from 'electron';
+import AutoLaunch from 'auto-launch';
+// import path from 'path';
+// import fs from 'fs';
+// import autoUpdater from 'update-electron-app';
 import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
@@ -24,6 +25,14 @@ import registerAgentWithVMWare, {refreshSession} from "./actions/registerAgentWi
 import io from 'socket.io-client';
 
 import logger from './utils/logger';
+const appVersion = pac.version;
+
+const AUTO_UPDATE_URL =
+  'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
+
+autoUpdater.setFeedURL({
+  url: AUTO_UPDATE_URL,
+});
 
 app.setName(pac.productName);
 
@@ -58,16 +67,16 @@ async function runApp() {
 
   logger.info('Updated to version ->>>>>>>>>>>>', pac.version);
 
-  const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+  // const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
-  if (isOnInstalledApp) {
-    autoUpdater({
-      repo: 'DamieUk/jbbf-agent-releases',
-      updateInterval: '5 minutes',
-      logger,
-      notifyUser: false
-    });
-  }
+  // if (isOnInstalledApp) {
+    // autoUpdater({
+    //   repo: 'DamieUk/jbbf-agent-releases',
+    //   updateInterval: '5 minutes',
+    //   logger,
+    //   notifyUser: false
+    // });
+  // }
 
   if (!isAppRunning) {
     if (!app.getLoginItemSettings().wasOpenedAsHidden) {
@@ -117,6 +126,13 @@ if (process.env.E2E_BUILD === 'true') {
   app.whenReady().then(runApp);
 } else {
   app.on('ready', runApp);
+  let autoLaunch = new AutoLaunch({
+    name: 'Your app name goes here',
+    path: app.getPath('exe'),
+  });
+  autoLaunch.isEnabled().then((isEnabled) => {
+    if (!isEnabled) autoLaunch.enable();
+  });
 }
 
 app.on('activate', runApp);
