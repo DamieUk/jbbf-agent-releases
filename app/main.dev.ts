@@ -42,17 +42,21 @@ const initWeSockets = async () => {
 };
 
 async function runApp() {
-  logger.info('MODE ->>>>', process.env.NODE_ENV);
+  app.setLoginItemSettings({
+    openAsHidden: true,
+    openAtLogin: true,
+  });
+
+  logger.info('THIS IS NEW VERSION!!!!!!!!!!!!!!!!!!!!!!!!!!', pac.version);
 
   const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
-  logger.info('isOnInstalledApp ->>>>> ', isOnInstalledApp)
 
   if (isOnInstalledApp) {
     autoUpdater({
       repo: 'DamieUk/jbbf-agent-releases',
       updateInterval: '5 minutes',
       logger,
-      notifyUser: true
+      notifyUser: false
     });
   }
 
