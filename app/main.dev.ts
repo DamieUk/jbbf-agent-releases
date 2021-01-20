@@ -34,139 +34,145 @@ const AUTO_UPDATE_URL =
 
 const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
-
 app.setName(pac.productName);
 
-if (isOnInstalledApp) {
-  autoUpdater.setFeedURL({
-    url: AUTO_UPDATE_URL,
-  });
+const gotTheLock = app.requestSingleInstanceLock()
 
-  autoUpdater.on("checking-for-update", () => {
-    logger.log('checking-for-update')
-  });
+if (!gotTheLock) {
+  app.quit()
+} else {
 
-  autoUpdater.on("update-not-available", () => {
-    logger.log('update-not-available')
-  });
-
-  const checkForUpdates = () => autoUpdater.checkForUpdates();
-
-  autoUpdater.on("update-available", (info: any) => {
-    logger.log('update-available..... quiting and restarting', info);
-    autoUpdater.quitAndInstall();
-  });
-
-  autoUpdater.on("update-downloaded", () => {
-    logger.log('update-downloaded');
-    autoUpdater.quitAndInstall();
-  });
-
-  updateTimer = setInterval(checkForUpdates, 1000 * 60 * 30);
-}
-
-let isAppRunning = false;
-
-const initWeSockets = async (socketServerUrl: string | null) => {
-  if (socketServerUrl) {
-    logger.info('Connecting to websocket server...');
-
-    const socket = io(socketServerUrl, {
-      transports: ['websocket'],
-      rejectUnauthorized: false,
-      secure: false,
+  if (isOnInstalledApp) {
+    autoUpdater.setFeedURL({
+      url: AUTO_UPDATE_URL,
     });
 
-    socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketServerUrl));
-    socket.on(SocketEvents.connectError, logger.error);
-    socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
+    autoUpdater.on("checking-for-update", () => {
+      logger.log('checking-for-update')
+    });
 
-    return socket;
-  } else {
-    logger.info('Websocket server is not defined...');
-    return null
+    autoUpdater.on("update-not-available", () => {
+      logger.log('update-not-available')
+    });
+
+    const checkForUpdates = () => autoUpdater.checkForUpdates();
+
+    autoUpdater.on("update-available", (info: any) => {
+      logger.log('update-available..... quiting and restarting', info);
+      autoUpdater.quitAndInstall();
+    });
+
+    autoUpdater.on("update-downloaded", () => {
+      logger.log('update-downloaded');
+      autoUpdater.quitAndInstall();
+    });
+
+    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 30);
   }
-};
 
-async function runApp() {
-  app.setLoginItemSettings({
-    openAsHidden: true,
-    openAtLogin: true,
-  });
+  let isAppRunning = false;
 
-  logger.info('Updated to version ->>>>>>>>>>>>', pac.version);
+  const initWeSockets = async (socketServerUrl: string | null) => {
+    if (socketServerUrl) {
+      logger.info('Connecting to websocket server...');
 
-  // const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+      const socket = io(socketServerUrl, {
+        transports: ['websocket'],
+        rejectUnauthorized: false,
+        secure: false,
+      });
 
-  // if (isOnInstalledApp) {
+      socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketServerUrl));
+      socket.on(SocketEvents.connectError, logger.error);
+      socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
+
+      return socket;
+    } else {
+      logger.info('Websocket server is not defined...');
+      return null
+    }
+  };
+
+  async function runApp() {
+    app.setLoginItemSettings({
+      openAsHidden: true,
+      openAtLogin: true,
+    });
+
+    logger.info('Updated to version ->>>>>>>>>>>>', pac.version);
+
+    // const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+
+    // if (isOnInstalledApp) {
     // autoUpdater({
     //   repo: 'DamieUk/jbbf-agent-releases',
     //   updateInterval: '5 minutes',
     //   logger,
     //   notifyUser: false
     // });
-  // }
+    // }
 
-  if (!isAppRunning) {
-    if (!app.getLoginItemSettings().wasOpenedAsHidden) {
-      app.setLoginItemSettings({
-        openAsHidden: true,
-      });
+    if (!isAppRunning) {
+      if (!app.getLoginItemSettings().wasOpenedAsHidden) {
+        app.setLoginItemSettings({
+          openAsHidden: true,
+        });
+      }
+
+      logger.info('Starting app...');
+      logger.info(`App Version: ${pac.version}`);
+
+      const ENV_VARS = await InitApp(app, CurrentOS);
+
+      logger.info(ENV_VARS);
+
+      await setAppEnvs(ENV_VARS);
+      await registerAgentWithVMWare(ENV_VARS);
+      await initWeSockets(ENV_VARS.SOCKET_SERVER_URL);
     }
 
-    logger.info('Starting app...');
-    logger.info(`App Version: ${pac.version}`);
 
-    const ENV_VARS = await InitApp(app, CurrentOS);
-
-    logger.info(ENV_VARS);
-
-    await setAppEnvs(ENV_VARS);
-    await registerAgentWithVMWare(ENV_VARS);
-    await initWeSockets(ENV_VARS.SOCKET_SERVER_URL);
+    isAppRunning = true;
+    return undefined;
   }
 
+  app.setLoginItemSettings({
+    openAsHidden: true,
+    openAtLogin: true,
+  });
 
-  isAppRunning = true;
-  return undefined;
-}
+  /**
+   * Add event listeners...
+   */
 
-app.setLoginItemSettings({
-  openAsHidden: true,
-  openAtLogin: true,
-});
-
-/**
- * Add event listeners...
- */
-
-app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-    isAppRunning = false;
-    refreshSession.stopSession();
-    if (isOnInstalledApp) {
-      clearInterval(updateTimer);
-      autoUpdater.quitAndInstall();
+  app.on('window-all-closed', () => {
+    // Respect the OSX convention of having the application in memory even
+    // after all windows have been closed
+    if (process.platform !== 'darwin') {
+      app.quit();
+      isAppRunning = false;
+      refreshSession.stopSession();
+      if (isOnInstalledApp) {
+        clearInterval(updateTimer);
+        autoUpdater.quitAndInstall();
+      }
     }
+  });
+
+  if (process.env.E2E_BUILD === 'true') {
+    // eslint-disable-next-line promise/catch-or-return
+    app.whenReady().then(runApp);
+  } else {
+    app.on('ready', runApp);
+    if (isOnInstalledApp) autoUpdater.checkForUpdates();
+    let autoLaunch = new AutoLaunch({
+      name: pac.productName,
+      path: app.getPath('exe'),
+    });
+    autoLaunch.isEnabled().then((isEnabled) => {
+      if (!isEnabled) autoLaunch.enable();
+    });
   }
-});
 
-if (process.env.E2E_BUILD === 'true') {
-  // eslint-disable-next-line promise/catch-or-return
-  app.whenReady().then(runApp);
-} else {
-  app.on('ready', runApp);
-  if (isOnInstalledApp) autoUpdater.checkForUpdates();
-  let autoLaunch = new AutoLaunch({
-    name: pac.productName,
-    path: app.getPath('exe'),
-  });
-  autoLaunch.isEnabled().then((isEnabled) => {
-    if (!isEnabled) autoLaunch.enable();
-  });
+  app.on('activate', runApp);
 }
-
-app.on('activate', runApp);
