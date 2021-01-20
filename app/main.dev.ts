@@ -15,30 +15,39 @@ import path from 'path';
 import fs from 'fs';
 import autoUpdater from 'update-electron-app';
 import pac from '../package.json';
-import { SocketEvents } from './sockets/constants';
-import socket from './sockets/socketInstance';
+import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
-import { CurrentOS } from './enums';
+import {CurrentOS} from './enums';
 import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
-import registerAgentWithVMWare, { refreshSession } from "./actions/registerAgentWithVMWare";
+import registerAgentWithVMWare, {refreshSession} from "./actions/registerAgentWithVMWare";
+import io from 'socket.io-client';
 
 import logger from './utils/logger';
 
-logger.info(`Feed url ->>>>> DamieUk/jbbf-agent-releases`);
 app.setName(pac.productName);
-
 
 let isAppRunning = false;
 
-const initWeSockets = async () => {
-  logger.info('Connecting to websocket server...');
+const initWeSockets = async (socketServerUrl: string | null) => {
+  if (socketServerUrl) {
+    logger.info('Connecting to websocket server...');
 
-  socket.on(SocketEvents.connect, evenCallbacks.onConnect);
-  socket.on(SocketEvents.connectError, logger.error);
-  socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
+    const socket = io(socketServerUrl, {
+      transports: ['websocket'],
+      rejectUnauthorized: false,
+      secure: false,
+    });
 
-  return socket;
+    socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketServerUrl));
+    socket.on(SocketEvents.connectError, logger.error);
+    socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
+
+    return socket;
+  } else {
+    logger.info('Websocket server is not defined...');
+    return null
+  }
 };
 
 async function runApp() {
@@ -47,7 +56,7 @@ async function runApp() {
     openAtLogin: true,
   });
 
-  logger.info('THIS IS NEW VERSION!!!!!!!!!!!!!!!!!!!!!!!!!!', pac.version);
+  logger.info('THIS IS NEW VERSION!!!!!!!!!!!!', pac.version);
 
   const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
@@ -76,7 +85,7 @@ async function runApp() {
 
     await setAppEnvs(ENV_VARS);
     await registerAgentWithVMWare(ENV_VARS);
-    await initWeSockets();
+    await initWeSockets(ENV_VARS.SOCKET_SERVER_URL);
   }
   isAppRunning = true;
   return undefined;
