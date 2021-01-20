@@ -13,7 +13,7 @@ import 'regenerator-runtime/runtime';
 import {app, autoUpdater} from 'electron';
 import AutoLaunch from 'auto-launch';
 import fs from 'fs';
-// import path from 'path';
+import path from 'path';
 // import autoUpdater from 'update-electron-app';
 import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
