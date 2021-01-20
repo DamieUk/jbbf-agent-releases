@@ -27,8 +27,12 @@ import io from 'socket.io-client';
 import logger from './utils/logger';
 const appVersion = pac.version;
 
+let updateTimer: any = null;
+
 const AUTO_UPDATE_URL =
   'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
+
+const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
 autoUpdater.setFeedURL({
   url: AUTO_UPDATE_URL,
@@ -50,7 +54,9 @@ autoUpdater.on("update-available", logger.log);
 autoUpdater.on("update-downloaded", logger.log);
 const checkForUpdates = () => autoUpdater.checkForUpdates();
 
-setInterval(checkForUpdates, 1000 * 60)
+if (isOnInstalledApp) {
+  updateTimer = setInterval(checkForUpdates, 1000 * 60);
+}
 
 let isAppRunning = false;
 
@@ -134,7 +140,10 @@ app.on('window-all-closed', () => {
     app.quit();
     isAppRunning = false;
     refreshSession.stopSession();
-    autoUpdater.quitAndInstall();
+    if (isOnInstalledApp) {
+      clearInterval(updateTimer);
+      autoUpdater.quitAndInstall();
+    }
   }
 });
 
