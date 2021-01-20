@@ -11,8 +11,8 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app} from 'electron';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
 import autoUpdater from 'update-electron-app';
 import pac from '../package.json';
 import { SocketEvents } from './sockets/constants';
@@ -21,7 +21,8 @@ import * as evenCallbacks from './sockets/eventCallbacks';
 import { CurrentOS } from './enums';
 import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
-import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
+import { isFileExist } from './utils/files';
+import registerAgentWithVMWare, { refreshSession } from "./actions/registerAgentWithVMWare";
 
 import logger from './utils/logger';
 
@@ -42,14 +43,19 @@ const initWeSockets = async () => {
 };
 
 async function runApp() {
-  const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+  logger.info('MODE ->>>>', process.env.NODE_ENV);
+
+  const isOnInstalledApp1 = await isFileExist(path.resolve(path.dirname(process.execPath), '..', 'update.exe')).catch(() => false)
+  logger.info(path.dirname(process.execPath), path.resolve(path.dirname(process.execPath), '..', 'update.exe'), isOnInstalledApp1, fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe')));
+  const isOnInstalledApp = process.env.NODE_ENV === 'development';
   logger.info('isOnInstalledApp ->>>>> ', isOnInstalledApp)
 
   if (isOnInstalledApp) {
     autoUpdater({
       repo: 'DamieUk/jbbf-agent-releases',
       updateInterval: '5 minutes',
-      logger
+      logger,
+      notifyUser: true
     });
   }
 
@@ -90,6 +96,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
     isAppRunning = false;
+    refreshSession.stopSession();
   }
 });
 

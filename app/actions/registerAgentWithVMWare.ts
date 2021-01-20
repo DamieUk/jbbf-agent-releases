@@ -4,6 +4,30 @@ import {AgentSession} from "../utils/session";
 import {writeFile} from "../utils/files";
 import {ISession} from "global-shapes";
 
+class RefreshSession {
+  timer: any = undefined;
+
+  requestNewSession = () => {
+    request.apiServer.POST(
+      '/agent-auth/refresh',
+      {data: {refreshToken: AgentSession.getSession().refreshToken}}
+    ).then((session: ISession) => {
+      AgentSession.setSession(session);
+      return writeFile(AgentSession.getEnvs().SESSION_PATH, JSON.stringify(session));
+    })
+  }
+
+  startSession = () => {
+    this.timer = setInterval(this.requestNewSession, 1000 * 60 * 14); // update every 14 minutes
+  }
+
+  stopSession = () => {
+    clearInterval(this.timer);
+  }
+}
+
+export const refreshSession = new RefreshSession();
+
 const registerApp = async (envs: IAppEnvironments) => {
   if (envs.AGENT_TOKEN) {
     return await request.apiServer.PUT('/agent-auth/verify', {
@@ -11,9 +35,10 @@ const registerApp = async (envs: IAppEnvironments) => {
         token: envs.AGENT_TOKEN,
         publicKey: AgentSession.getEnvs().publicKey
       }
-    }).then((res: ISession) => {
+    }).then(async (res: ISession) => {
       AgentSession.setSession(res);
-      writeFile(envs.SESSION_PATH, JSON.stringify(res));
+      await writeFile(envs.SESSION_PATH, JSON.stringify(res));
+      refreshSession.startSession()
       return res;
     })
   }

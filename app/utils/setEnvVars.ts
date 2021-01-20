@@ -43,8 +43,8 @@ export const setEnvVars = async (os: OS_TYPE): Promise<IEnvVars> => {
 
 export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEnvVars> => {
   const allEnvs: IDynamicEnvVars = {
-    AGENT_TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-    API_SERVER_URL: 'http://jbbf-test-app-api.jbbf.ch',
+    AGENT_TOKEN:  null,
+    API_SERVER_URL: null,
     SCRIPT_SERVER_URL: null,
     SOCKET_SERVER_URL: null,
     VM_ID: null,

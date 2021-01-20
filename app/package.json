@@ -1,7 +1,7 @@
 {
   "name": "jbbf-automation-agent",
   "productName": "JBBFAgent",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "JBBF agent for managing and executing platform scripts automatically",
   "main": "./main.prod.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "@types/socket.io-client": "^1.4.34",
     "auto-launch": "^5.0.5",
     "curlrequest": "^1.0.1",
-    "electron-auto-update": "^1.2.2",
+    "electron-builder-squirrel-windows": "^22.10.4",
     "electron-updater": "^4.3.5",
     "node-forge": "^0.10.0",
     "socket.io-client": "^2.3.0",
