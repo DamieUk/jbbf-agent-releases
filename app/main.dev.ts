@@ -89,7 +89,6 @@ async function runApp() {
   }
 
 
-
   isAppRunning = true;
   return undefined;
 }
