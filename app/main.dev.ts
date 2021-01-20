@@ -14,7 +14,7 @@ import {app} from 'electron';
 import path from 'path';
 import fs from 'fs';
 import autoUpdater from 'update-electron-app';
-import pac from '../package.json';
+import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
 import {CurrentOS} from './enums';
@@ -56,7 +56,7 @@ async function runApp() {
     openAtLogin: true,
   });
 
-  logger.info('THIS IS NEW VERSION!!!!!!!!!!!!', pac.version);
+  logger.info('Updated to version ->>>>>>>>>>>>', pac.version);
 
   const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
