@@ -62,7 +62,7 @@ if (isOnInstalledApp) {
     autoUpdater.quitAndInstall();
   });
 
-  updateTimer = setInterval(checkForUpdates, 1000 * 60);
+  updateTimer = setInterval(checkForUpdates, 1000 * 60 * 30);
 }
 
 let isAppRunning = false;
