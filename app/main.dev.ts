@@ -34,14 +34,12 @@ const AUTO_UPDATE_URL =
 
 const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
-app.setName(pac.productName);
-
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
   app.quit()
 } else {
-
+  app.setName(pac.productName);
   if (isOnInstalledApp) {
     autoUpdater.setFeedURL({
       url: AUTO_UPDATE_URL,
@@ -67,7 +65,7 @@ if (!gotTheLock) {
       autoUpdater.quitAndInstall();
     });
 
-    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 30);
+    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 5);
   }
 
   let isAppRunning = false;
@@ -146,8 +144,6 @@ if (!gotTheLock) {
    */
 
   app.on('window-all-closed', () => {
-    // Respect the OSX convention of having the application in memory even
-    // after all windows have been closed
     if (process.platform !== 'darwin') {
       app.quit();
       isAppRunning = false;
@@ -168,6 +164,7 @@ if (!gotTheLock) {
     let autoLaunch = new AutoLaunch({
       name: pac.productName,
       path: app.getPath('exe'),
+      isHidden: true
     });
     autoLaunch.isEnabled().then((isEnabled) => {
       if (!isEnabled) autoLaunch.enable();
