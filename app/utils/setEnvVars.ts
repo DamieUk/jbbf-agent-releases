@@ -51,8 +51,8 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
   };
 
   try {
-    logger.info('tool path ->>>>>>>>>>>>> ' , `c%${vmTool}\\vmtoolsd --cmd “info-get guestinfo.ovfenv”`)
-    const xml = await execute(`c%${vmTool}\\vmtoolsd --cmd “info-get guestinfo.ovfenv”`);
+    logger.info('tool path ->>>>>>>>>>>>> ' , `${vmTool}\\vmtoolsd --cmd “info-get guestinfo.ovfenv”`)
+    const xml = await execute(`${vmTool}\\vmtoolsd --cmd “info-get guestinfo.ovfenv”`);
     logger.info('xml ->>>', xml)
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xml, "text/xml");

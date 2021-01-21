@@ -66,6 +66,10 @@ if (!gotTheLock) {
       logger.log('update-not-available')
     });
 
+    autoUpdater.on("update-downloaded", () => {
+      quitAndInstall();
+    });
+
     autoUpdater.on("error", (err) => {
       logger.error('update-error ->> ', err)
     });
@@ -151,7 +155,6 @@ if (!gotTheLock) {
     app.whenReady().then(runApp);
   } else {
     app.on('ready', runApp);
-    if (isOnInstalledApp) autoUpdater.checkForUpdates();
     let autoLaunch = new AutoLaunch({
       name: pac.productName,
       path: app.getPath('exe'),
