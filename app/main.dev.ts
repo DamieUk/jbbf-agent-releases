@@ -66,17 +66,6 @@ if (!gotTheLock) {
       logger.log('update-not-available')
     });
 
-
-    autoUpdater.on("update-available", (info: any) => {
-      logger.log('update-available..... quiting and restarting', info);
-      quitAndInstall();
-    });
-
-    autoUpdater.on("update-downloaded", () => {
-      logger.log('update-downloaded');
-      quitAndInstall();
-    });
-
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 5);
   }
 

@@ -13,7 +13,7 @@ type IOSVars = {
 
 const VARS: IOSVars = {
   WINDOWS: {
-    VM_TOOLS_UTILS: 'c:/Program Files/VMware/VMware Tools'
+    VM_TOOLS_UTILS: `c:\\Program Files\\VMware\\VMware Tools`
   },
   MAC: {
     VM_TOOLS_UTILS: 'set/mac/vmwaretools/path'
