@@ -1,4 +1,4 @@
-import {execute} from './execute';
+import {executeExeFile, execute } from './execute';
 import DomParser  from "dom-parser";
 import {OS_TYPE} from "os-enums";
 import {IDynamicEnvVars} from "env-enums";
@@ -55,7 +55,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
 
   try {
     logger.info('COMMAND! ->>>>>>>>>>>>> ' , `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
-    const xml = await execute(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
+    const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
     logger.info('xml ->>>', xml)
     const xmlDoc = domParser.parseFromString(xml);
     logger.log('xmlDoc ->>>', xmlDoc)

@@ -102,7 +102,7 @@ if (!gotTheLock) {
     }
   };
 
-  async function runApp() {
+  const runApp = async () => {
     app.setLoginItemSettings({
       openAsHidden: true,
       openAtLogin: true,
@@ -131,7 +131,7 @@ if (!gotTheLock) {
 
     isAppRunning = true;
     return undefined;
-  }
+  };
 
   app.setLoginItemSettings({
     openAsHidden: true,
