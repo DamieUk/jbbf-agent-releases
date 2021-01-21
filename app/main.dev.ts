@@ -62,6 +62,10 @@ if (!gotTheLock) {
       logger.log('checking-for-update')
     });
 
+    autoUpdater.on("update-available", () => {
+      logger.log('update-available...Please reboot your device')
+    });
+
     autoUpdater.on("update-not-available", () => {
       logger.log('update-not-available')
     });
