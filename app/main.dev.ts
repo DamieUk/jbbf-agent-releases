@@ -78,7 +78,7 @@ if (!gotTheLock) {
       logger.error('update-error ->> ', err)
     });
 
-    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 5);
+    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 2);
   }
 
   const initWeSockets = async (socketServerUrl: string | null) => {
