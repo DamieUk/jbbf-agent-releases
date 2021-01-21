@@ -34,12 +34,25 @@ const AUTO_UPDATE_URL =
 
 const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
 
-const gotTheLock = app.requestSingleInstanceLock()
+const gotTheLock = app.requestSingleInstanceLock();
+
+let isAppRunning = false;
 
 if (!gotTheLock) {
-  app.quit()
+  app.quit();
 } else {
   app.setName(pac.productName);
+
+  const quitAndInstall = () => {
+    try {
+      autoUpdater.quitAndInstall();
+    } catch (e) {
+      logger.error(e)
+    }
+  }
+
+  const checkForUpdates = () => autoUpdater.checkForUpdates();
+
   if (isOnInstalledApp) {
     autoUpdater.setFeedURL({
       url: AUTO_UPDATE_URL,
@@ -53,22 +66,19 @@ if (!gotTheLock) {
       logger.log('update-not-available')
     });
 
-    const checkForUpdates = () => autoUpdater.checkForUpdates();
 
     autoUpdater.on("update-available", (info: any) => {
       logger.log('update-available..... quiting and restarting', info);
-      autoUpdater.quitAndInstall();
+      quitAndInstall();
     });
 
     autoUpdater.on("update-downloaded", () => {
       logger.log('update-downloaded');
-      autoUpdater.quitAndInstall();
+      quitAndInstall();
     });
 
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 5);
   }
-
-  let isAppRunning = false;
 
   const initWeSockets = async (socketServerUrl: string | null) => {
     if (socketServerUrl) {
@@ -97,18 +107,6 @@ if (!gotTheLock) {
       openAtLogin: true,
     });
 
-    logger.info('Updated to version ->>>>>>>>>>>>', pac.version);
-
-    // const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
-
-    // if (isOnInstalledApp) {
-    // autoUpdater({
-    //   repo: 'DamieUk/jbbf-agent-releases',
-    //   updateInterval: '5 minutes',
-    //   logger,
-    //   notifyUser: false
-    // });
-    // }
 
     if (!isAppRunning) {
       if (!app.getLoginItemSettings().wasOpenedAsHidden) {
@@ -150,7 +148,7 @@ if (!gotTheLock) {
       refreshSession.stopSession();
       if (isOnInstalledApp) {
         clearInterval(updateTimer);
-        autoUpdater.quitAndInstall();
+        quitAndInstall();
       }
     }
   });

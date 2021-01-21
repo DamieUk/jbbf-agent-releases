@@ -13,7 +13,7 @@ type IOSVars = {
 
 const VARS: IOSVars = {
   WINDOWS: {
-    VM_TOOLS_UTILS: 'C:/Program Files/VMware/VMware Tools'
+    VM_TOOLS_UTILS: 'c:/Program Files/VMware/VMware Tools'
   },
   MAC: {
     VM_TOOLS_UTILS: 'set/mac/vmwaretools/path'
@@ -51,9 +51,12 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
   };
 
   try {
-    const xml = await execute(`${vmTool}/vmtoolsd --cmd “info-get guestinfo.ovfenv”`)
+    logger.log(`%${vmTool}%/vmtoolsd --cmd “info-get guestinfo.ovfenv”`, `${vmTool}/vmtoolsd --cmd “info-get guestinfo.ovfenv”`)
+    const xml = await execute(`%${vmTool}%/vmtoolsd --cmd “info-get guestinfo.ovfenv”`);
+    logger.info('xml ->>>', xml)
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xml, "text/xml");
+    logger.log('xmlDoc ->>>', xmlDoc)
 
     xmlDoc.getElementsByTagName("Property");
 
@@ -67,6 +70,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
       // @ts-ignore
       allEnvs[key] = found ? found.attributes['oe:value'].value : allEnvs[key]
     });
+    logger.log(allEnvs);
   } catch (err) {
     logger.error('Could not get agent environment variables. Please, check if vmtoolsd service working properly or installed' , err)
   }
