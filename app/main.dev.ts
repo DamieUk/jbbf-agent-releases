@@ -66,6 +66,10 @@ if (!gotTheLock) {
       logger.log('update-not-available')
     });
 
+    autoUpdater.on("error", (err) => {
+      logger.error('update-error ->> ', err)
+    });
+
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 5);
   }
 
