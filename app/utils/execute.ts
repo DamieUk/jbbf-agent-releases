@@ -1,4 +1,5 @@
 import {ExecException} from "child_process";
+import logger from "./logger";
 
 const childProcess = require("child_process");
 
@@ -32,6 +33,8 @@ export function execute<C extends string>(command: C): Promise<string> {
 
         return;
       }
+
+      logger.info(`Executed command ${command}. Output is -> `, standardOutput)
 
       resolve(standardOutput);
     });

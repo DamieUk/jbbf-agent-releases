@@ -1,7 +1,10 @@
 import {execute} from './execute';
+import DomParser  from "dom-parser";
 import {OS_TYPE} from "os-enums";
 import {IDynamicEnvVars} from "env-enums";
 import logger from "./logger";
+
+const domParser = new DomParser();
 
 interface IEnvVars {
   VM_TOOLS_UTILS: string;
@@ -54,8 +57,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
     logger.info('COMMAND! ->>>>>>>>>>>>> ' , `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
     const xml = await execute(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
     logger.info('xml ->>>', xml)
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xml, "text/xml");
+    const xmlDoc = domParser.parseFromString(xml);
     logger.log('xmlDoc ->>>', xmlDoc)
 
     const Properties = xmlDoc.getElementsByTagName("Property");
@@ -63,7 +65,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
     ENV_VAR_NAMES_LIST.forEach(key => {
 
       // @ts-ignore
-      const found = [...Properties].find(node => {
+      const found = [...Properties].find((node: any) => {
         return node.attributes['oe:key'].value === key
       });
 
