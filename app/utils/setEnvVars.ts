@@ -58,12 +58,12 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
     const xmlDoc = parser.parseFromString(xml, "text/xml");
     logger.log('xmlDoc ->>>', xmlDoc)
 
-    xmlDoc.getElementsByTagName("Property");
+    const Properties = xmlDoc.getElementsByTagName("Property");
 
     ENV_VAR_NAMES_LIST.forEach(key => {
 
       // @ts-ignore
-      const found = [...xmlDoc.getElementsByTagName("Property")].find(node => {
+      const found = [...Properties].find(node => {
         return node.attributes['oe:key'].value === key
       });
 
