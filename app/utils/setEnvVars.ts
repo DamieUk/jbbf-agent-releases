@@ -1,5 +1,5 @@
-import {executeExeFile, execute } from './execute';
-import DomParser  from "dom-parser";
+import {execute, executeProgram} from './execute';
+import DomParser from "dom-parser";
 import {OS_TYPE} from "os-enums";
 import {IDynamicEnvVars} from "env-enums";
 import logger from "./logger";
@@ -46,7 +46,7 @@ export const setEnvVars = async (os: OS_TYPE): Promise<IEnvVars> => {
 
 export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEnvVars> => {
   const allEnvs: IDynamicEnvVars = {
-    AGENT_TOKEN:  null,
+    AGENT_TOKEN: null,
     API_SERVER_URL: null,
     SCRIPT_SERVER_URL: null,
     SOCKET_SERVER_URL: null,
@@ -54,8 +54,9 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
   };
 
   try {
-    logger.info('COMMAND! ->>>>>>>>>>>>> ' , `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
-    const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
+    logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
+    // const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
+    const xml = await executeProgram('vmtoolsd.exe', { '--cmd': "info-get guestinfo.ovfenv"}, vmTool);
     logger.info('xml ->>>', xml)
     const xmlDoc = domParser.parseFromString(xml);
     logger.log('xmlDoc ->>>', xmlDoc)
@@ -74,7 +75,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
     });
     logger.log(allEnvs);
   } catch (err) {
-    logger.error('Could not get agent environment variables. Please, check if vmtoolsd service working properly or installed' , err)
+    logger.error('Could not get agent environment variables. Please, check if vmtoolsd service working properly or installed', err)
   }
 
   return allEnvs;

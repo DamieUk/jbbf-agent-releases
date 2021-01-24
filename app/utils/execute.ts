@@ -1,7 +1,6 @@
-import {ExecException} from "child_process";
+import {execFile, exec, spawn} from "child_process";
 import logger from "./logger";
 
-const childProcess = require("child_process");
 
 /**
  * @param {string} command A shell command to execute
@@ -21,7 +20,7 @@ export function execute<C extends string>(command: C): Promise<string> {
      * @param {string|Buffer} standardError The error resulting of the shell command execution
      * @see https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
      */
-    childProcess.exec(command, (error: ExecException, standardOutput: string, standardError: string) => {
+    exec(command, (error, standardOutput: string, standardError: string) => {
       if (error) {
         reject();
 
@@ -37,6 +36,25 @@ export function execute<C extends string>(command: C): Promise<string> {
       logger.info(`Executed command "${command}". Output is -> `, standardOutput)
 
       resolve(standardOutput);
+    });
+  });
+}
+
+/**
+ * Function to execute exe
+ * @param {string} fileName The name of the executable file to run.
+ * @param {string[]} params List of string arguments.
+ * @param {string} path Current working directory of the child process.
+ */
+export function executeProgram(fileName: string, params: any, path: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile(fileName, params, { cwd: path }, (err: any, data: any) => {
+      if (err) {
+        logger.error(err);
+        return reject(err);
+      }
+      logger.info(`Executed ${path}${fileName} ${JSON.stringify(params)} -> Response ${JSON.stringify(data)}`);
+      return resolve(data);
     });
   });
 }
@@ -60,7 +78,7 @@ export function executeExeFile<C extends string>(command: C): Promise<string> {
      * @see https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
      */
 
-    const cp = childProcess.spawn(command);
+    const cp = spawn(command);
 
     cp.stdout.on('data', (data: any) => {
       logger.info('stdout: ' + data);
@@ -72,22 +90,5 @@ export function executeExeFile<C extends string>(command: C): Promise<string> {
       reject(err)
     });
 
-    // childProcess.exec(command, (error: ExecException, standardOutput: string, standardError: string) => {
-    //   if (error) {
-    //     reject();
-    //
-    //     return;
-    //   }
-    //
-    //   if (standardError) {
-    //     reject(standardError);
-    //
-    //     return;
-    //   }
-    //
-    //   logger.info(`Executed command "${command}". Output is -> `, standardOutput)
-    //
-    //   resolve(standardOutput);
-    // });
   });
 }
