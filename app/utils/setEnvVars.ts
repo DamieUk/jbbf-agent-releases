@@ -56,7 +56,7 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
   try {
     logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
     // const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
-    const xml = await executeProgram('vmtoolsd.exe', { '--cmd': "info-get guestinfo.ovfenv"}, vmTool);
+    const xml = await executeProgram(`${vmTool}/vmtoolsd.exe`, { '--cmd': "info-get guestinfo.ovfenv"});
     logger.info('xml ->>>', xml)
     const xmlDoc = domParser.parseFromString(xml);
     logger.log('xmlDoc ->>>', xmlDoc)

@@ -42,18 +42,18 @@ export function execute<C extends string>(command: C): Promise<string> {
 
 /**
  * Function to execute exe
- * @param {string} fileName The name of the executable file to run.
+ * @param {string} filePath The name of the executable file to run.
  * @param {string[]} params List of string arguments.
  * @param {string} path Current working directory of the child process.
  */
-export function executeProgram(fileName: string, params: any, path: string): Promise<string> {
+export function executeProgram(filePath: string, params: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile(fileName, params, { cwd: path }, (err: any, data: any) => {
+    execFile(filePath, params, (err: any, data: any) => {
       if (err) {
         logger.error(err);
         return reject(err);
       }
-      logger.info(`Executed ${path}${fileName} ${JSON.stringify(params)} -> Response ${JSON.stringify(data)}`);
+      logger.info(`Executed ${filePath} ${JSON.stringify(params)} -> Response ${JSON.stringify(data)}`);
       return resolve(data);
     });
   });
