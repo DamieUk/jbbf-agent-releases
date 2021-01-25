@@ -237,8 +237,7 @@
     "electron-updater": "^4.3.4",
     "history": "^4.7.2",
     "regenerator-runtime": "^0.13.5",
-    "source-map-support": "^0.5.19",
-    "update-electron-app": "^2.0.1"
+    "source-map-support": "^0.5.19"
   },
   "devEngines": {
     "node": ">=7.x",

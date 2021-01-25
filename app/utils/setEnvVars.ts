@@ -1,10 +1,10 @@
 import {execute, executeProgram} from './execute';
-import DomParser from "dom-parser";
+import { DOMParser } from "xmldom";
 import {OS_TYPE} from "os-enums";
 import {IDynamicEnvVars} from "env-enums";
 import logger from "./logger";
 
-const domParser = new DomParser();
+const domParser = new DOMParser();
 
 interface IEnvVars {
   VM_TOOLS_UTILS: string;
@@ -57,8 +57,8 @@ export const pullEnvVarsFromVMTools = async (): Promise<IDynamicEnvVars> => {
     // logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
     // const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
     const xml = await executeProgram(`C:/"Program Files/VMware/VMware Tools/vmtoolsd.exe"`, ['--cmd "info-get guestinfo.ovfenv"']);
-    logger.info('xml ->>>', xml)
-    const xmlDoc = domParser.parseFromString(xml);
+    logger.info('xml ->>>', typeof xml, xml)
+    const xmlDoc = domParser.parseFromString(xml, "text/xml");
     logger.log('xmlDoc ->>>', xmlDoc)
 
     const Properties = xmlDoc.getElementsByTagName("Property");

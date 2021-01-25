@@ -54,7 +54,7 @@ export function executeProgram(filePath: string, params?: any): Promise<string> 
         logger.error(err);
         return reject(err);
       }
-      logger.info(`Executed ${filePath} ${JSON.stringify(params)} -> Response ${JSON.stringify(data)}`);
+      logger.info(`Executed ${filePath} ${JSON.stringify(params)}`);
       return resolve(data);
     });
   });
