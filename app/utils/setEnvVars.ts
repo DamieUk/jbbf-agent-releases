@@ -61,7 +61,7 @@ export const pullEnvVarsFromVMTools = async (): Promise<IDynamicEnvVars> => {
     const xmlDoc = domParser.parseFromString(xml, "text/xml");
     logger.log('xmlDoc ->>>', xmlDoc)
 
-    const Properties = xmlDoc.getElementsByTagName("Property");
+    const Properties = xmlDoc.documentElement.getElementsByTagName("Property");
 
     ENV_VAR_NAMES_LIST.forEach(key => {
 
