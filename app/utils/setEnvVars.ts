@@ -44,7 +44,7 @@ export const setEnvVars = async (os: OS_TYPE): Promise<IEnvVars> => {
   return VARS[os];
 };
 
-export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEnvVars> => {
+export const pullEnvVarsFromVMTools = async (): Promise<IDynamicEnvVars> => {
   const allEnvs: IDynamicEnvVars = {
     AGENT_TOKEN: null,
     API_SERVER_URL: null,
@@ -54,9 +54,9 @@ export const pullEnvVarsFromVMTools = async (vmTool: string): Promise<IDynamicEn
   };
 
   try {
-    logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
+    // logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
     // const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
-    const xml = await executeProgram(`${vmTool}/vmtoolsd.exe`, { '--cmd': "info-get guestinfo.ovfenv"});
+    const xml = await executeProgram(`C:/"Program Files/VMware/VMware Tools/vmtoolsd.exe"`, ['--cmd', 'info-get guestinfo.ovfenv']);
     logger.info('xml ->>>', xml)
     const xmlDoc = domParser.parseFromString(xml);
     logger.log('xmlDoc ->>>', xmlDoc)

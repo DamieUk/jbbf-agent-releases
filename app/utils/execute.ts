@@ -46,9 +46,10 @@ export function execute<C extends string>(command: C): Promise<string> {
  * @param {string[]} params List of string arguments.
  * @param {string} path Current working directory of the child process.
  */
-export function executeProgram(filePath: string, params: any): Promise<string> {
+export function executeProgram(filePath: string, params?: any): Promise<string> {
+  logger.info(`Executing ${filePath} ${JSON.stringify(params)}`)
   return new Promise((resolve, reject) => {
-    execFile(filePath, params, (err: any, data: any) => {
+    execFile(filePath, params, { shell: true }, (err: any, data: any) => {
       if (err) {
         logger.error(err);
         return reject(err);
@@ -64,7 +65,7 @@ export function executeProgram(filePath: string, params: any): Promise<string> {
  * @return {Promise<string>} A promise that resolve to the output of the shell command, or an error
  * @example const output = await execute("ls -alh");
  */
-export function executeExeFile<C extends string>(command: C): Promise<string> {
+export function executeExeFile<C extends string, P extends string[]>(command: C, params?: P): Promise<string> {
   /**
    * @param {Function} resolve A function that resolves the promise
    * @param {Function} reject A function that fails the promise
@@ -78,7 +79,7 @@ export function executeExeFile<C extends string>(command: C): Promise<string> {
      * @see https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
      */
 
-    const cp = spawn(command);
+    const cp = spawn(command, params, {shell: true});
 
     cp.stdout.on('data', (data: any) => {
       logger.info('stdout: ' + data);
