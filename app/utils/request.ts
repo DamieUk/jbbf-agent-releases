@@ -1,11 +1,9 @@
-import {app} from 'electron';
 // @ts-ignore
 import curl from 'curlrequest';
-import fs from 'fs';
 import {AGENT_API_PREFIX, SCRIPT_SERVER_PREFIX, SOCKET_SERVER_PREFIX} from "../enums";
 import {IAnyShape} from "global-shapes";
-import path from "path";
 import logger from "./logger";
+import {AgentSession} from "./session";
 
 type REQUEST_SOURCE = 'MAIN' | 'SOCKET' | 'SCRIPTS' | 'ANY';
 
@@ -23,38 +21,29 @@ const DEFAULT_HEADERS = {
 }
 
 const Fetch = (source: REQUEST_SOURCE, method: string) => (_url: string, options: IAnyShape): Promise<any> =>
-  new Promise(async (resolve, rej) => {
-    const projectPath = path.dirname(app.getPath(`exe`));
-    return fs.readFile(`${projectPath}/agentEnvsLocal.txt`, 'utf8', (err: any, data: string) => {
-      if (err) {
-        rej(err);
-        return logger.error(err);
-      }
+  new Promise((resolve, rej) => {
+    const envs = AgentSession.getEnvs();
 
-      const envs = JSON.parse(data);
+    const URL_PATHS = {
+      MAIN: `${envs.API_SERVER_URL}${PREFIXES[source]}`,
+      SOCKET: `${envs.SOCKET_SERVER_URL}${PREFIXES[source]}`,
+      SCRIPTS: `${envs.SCRIPT_SERVER_URL}${PREFIXES[source]}`,
+      ANY: ''
+    };
 
-      const URL_PATHS = {
-        MAIN: `${envs.API_SERVER_URL}${PREFIXES[source]}`,
-        SOCKET: `${envs.SOCKET_SERVER_URL}${PREFIXES[source]}`,
-        SCRIPTS: `${envs.SCRIPT_SERVER_URL}${PREFIXES[source]}`,
-        ANY: ''
-      };
-
-
-      const url = `${URL_PATHS[source]}${_url}`;
-      logger.log(`Fetching ${url} ...`);
-      return curl.request(
-        {url, method, ...{...options, headers: {...DEFAULT_HEADERS, ...options.headers}}},
-        (err: any, data: any) => {
-          if (err) {
-            logger.error(err);
-            return rej(err)
-          }
-          logger.info(`Received data from request ->>>> `, data);
-          resolve(data)
+    const url = `${URL_PATHS[source]}${_url}`;
+    logger.log(`Fetching ${url} ... ${options.data ? `data -> ${JSON.stringify(options.data)}` : ''}`);
+    return curl.request(
+      {url, method, ...{...options, headers: {...DEFAULT_HEADERS, ...options.headers}}},
+      (err: any, data: any) => {
+        if (err) {
+          logger.error(err);
+          return rej(err)
         }
-      )
-    });
+        logger.info(`Received data from request ->>>> `, data);
+        resolve(data)
+      }
+    )
   });
 
 const buildCRUD = (source: REQUEST_SOURCE) => ({
@@ -70,5 +59,3 @@ export const request = {
   scripts: buildCRUD("SCRIPTS"),
   any: buildCRUD("ANY"),
 }
-
-

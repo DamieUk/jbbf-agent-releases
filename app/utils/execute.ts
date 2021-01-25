@@ -1,7 +1,6 @@
 import {execFile, exec, spawn} from "child_process";
 import logger from "./logger";
 
-
 /**
  * @param {string} command A shell command to execute
  * @return {Promise<string>} A promise that resolve to the output of the shell command, or an error
@@ -47,14 +46,11 @@ export function execute<C extends string>(command: C): Promise<string> {
  * @param {string} path Current working directory of the child process.
  */
 export function executeProgram(filePath: string, params?: any): Promise<string> {
-  logger.info(`Executing ${filePath} ${JSON.stringify(params)}`)
   return new Promise((resolve, reject) => {
     execFile(filePath, params, { shell: true }, (err: any, data: any) => {
       if (err) {
-        logger.error(err);
         return reject(err);
       }
-      logger.info(`Executed ${filePath} ${JSON.stringify(params)}`);
       return resolve(data);
     });
   });

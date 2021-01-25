@@ -54,26 +54,20 @@ export const pullEnvVarsFromVMTools = async (): Promise<IDynamicEnvVars> => {
   };
 
   try {
-    // logger.info('COMMAND! ->>>>>>>>>>>>> ', `start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`)
-    // const xml = await executeExeFile(`start /D "${vmTool}" vmtoolsd.exe --cmd "info-get guestinfo.ovfenv"`);
     const xml = await executeProgram(`C:/"Program Files/VMware/VMware Tools/vmtoolsd.exe"`, ['--cmd "info-get guestinfo.ovfenv"']);
-    logger.info('xml ->>>', typeof xml, xml)
     const xmlDoc = domParser.parseFromString(xml, "text/xml");
-    logger.log('xmlDoc ->>>', xmlDoc)
 
-    const Properties = xmlDoc.documentElement.getElementsByTagName("Property");
+    const Properties = [].slice.call(xmlDoc.documentElement.getElementsByTagName("Property"));
 
     ENV_VAR_NAMES_LIST.forEach(key => {
 
-      // @ts-ignore
-      const found = [...Properties].find((node: any) => {
-        return node.attributes['oe:key'].value === key
+      const found = Properties.find((node: any) => {
+        return node.attributes['0'] ? node.attributes['0'].value === key : false;
       });
 
       // @ts-ignore
-      allEnvs[key] = found ? found.attributes['oe:value'].value : allEnvs[key]
+      allEnvs[key] = found ? found.attributes['1'].value : allEnvs[key]
     });
-    logger.log(allEnvs);
   } catch (err) {
     logger.error('Could not get agent environment variables. Please, check if vmtoolsd service working properly or installed', err)
   }

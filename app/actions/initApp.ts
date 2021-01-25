@@ -14,7 +14,7 @@ export default async function initApp<A extends App, O extends OS_TYPE>(app: A, 
   const projectPath = path.dirname(app.getPath(`exe`));
   const {privateKeyPath, publicKeyPath, keysDirPath} = await generateKeys(projectPath);
 
-  const DYNAMIC_ENV_VARS = await pullEnvVarsFromVMTools(ENV_VARS.VM_TOOLS_UTILS);
+  const DYNAMIC_ENV_VARS = await pullEnvVarsFromVMTools();
 
   const ALL_ENVS = {
     HOME,

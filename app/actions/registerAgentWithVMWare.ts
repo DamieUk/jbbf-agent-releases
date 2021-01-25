@@ -3,6 +3,7 @@ import {request} from "../utils/request";
 import {AgentSession} from "../utils/session";
 import {writeFile} from "../utils/files";
 import {ISession} from "global-shapes";
+import logger from "../utils/logger";
 
 class RefreshSession {
   timer: any = undefined;
@@ -40,7 +41,7 @@ const registerApp = async (envs: IAppEnvironments) => {
       await writeFile(envs.SESSION_PATH, JSON.stringify(res));
       refreshSession.startSession()
       return res;
-    })
+    }).catch(logger.error)
   }
   return;
 }
