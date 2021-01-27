@@ -36,61 +36,6 @@
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe --live electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-watch": "yarn test --watch"
   },
-  "build": {
-    "productName": "JBBFAgent",
-    "appId": "org.develar.JBBFAgent",
-    "files": [
-      "dist/",
-      "node_modules/",
-      "app.html",
-      "main.prod.js",
-      "main.prod.js.map",
-      "package.json"
-    ],
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "win": {
-      "target": ["nsis"],
-      "arch": [
-        "x64",
-        "ia32"
-      ]
-    },
-    "linux": {
-      "target": [
-        "deb",
-        "rpm",
-        "AppImage"
-      ],
-      "category": "Development"
-    },
-    "directories": {
-      "buildResources": "resources",
-      "output": "release"
-    },
-    "extraResources": [
-      "./resources/**"
-    ],
-    "publish": {
-      "provider": "github",
-      "owner": "DamieUk",
-      "repo": "jbbf-agent-releases",
-      "token": "4e562a27520836e2e28f10f913bf349bc7daef8d",
-      "private": false
-    }
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DamieUk/jbbf-agent-releases.git"
@@ -236,7 +181,7 @@
     "electron-builder-squirrel-windows": "^22.10.4",
     "electron-debug": "^3.1.0",
     "electron-log": "^4.2.4",
-    "electron-updater": "^4.3.4",
+    "electron-updater": "^4.3.5",
     "history": "^4.7.2",
     "regenerator-runtime": "^0.13.5",
     "source-map-support": "^0.5.19"

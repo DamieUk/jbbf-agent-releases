@@ -81,8 +81,9 @@ if (!gotTheLock) {
       quitAndInstall();
     });
 
-    autoUpdater.on("error", () => {
-      logger.error('New version not found')
+    autoUpdater.on("error", (err) => {
+      logger.error('New version not found', err);
+      logger.debug(err);
     });
 
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 2);
