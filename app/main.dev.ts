@@ -57,12 +57,14 @@ if (!gotTheLock) {
   const checkForUpdates = () => autoUpdater.checkForUpdates();
 
   if (isOnInstalledApp) {
+    logger.info(process.env);
+    process.env.GH_TOKEN = 'f206f76883f45b6fa4bf5e21affe64184da73d9f';
     autoUpdater.setFeedURL({
-      "provider":"github",
+      "provider": "github",
       "owner": "DamieUk",
       "repo": "jbbf-agent-releases",
       "token": "f206f76883f45b6fa4bf5e21affe64184da73d9f",
-      "private": true
+      "private": false
     });
 
     autoUpdater.on("checking-for-update", () => {
