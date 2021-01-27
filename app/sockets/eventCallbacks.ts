@@ -7,6 +7,6 @@ export function onConnect(url: string) {
   );
 }
 
-export function onRunTest() {
-  logger.info('on run test ->>> ');
+export function onRunCommand(ev: any) {
+  logger.info('on run test ->>> ', ev);
 }

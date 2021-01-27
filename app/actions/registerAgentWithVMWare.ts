@@ -9,13 +9,16 @@ class RefreshSession {
   timer: any = undefined;
 
   requestNewSession = () => {
-    request.apiServer.POST(
-      '/agent-auth/refresh',
-      {data: {refreshToken: AgentSession.getSession().refreshToken}}
-    ).then((session: ISession) => {
-      AgentSession.setSession(session);
-      return writeFile(AgentSession.getEnvs().SESSION_PATH, JSON.stringify(session));
-    })
+    if (AgentSession.getSession().accessToken) {
+      return request.apiServer.POST(
+        '/agent-auth/refresh',
+        {data: {refreshToken: AgentSession.getSession().refreshToken}}
+      ).then((session: ISession) => {
+        AgentSession.setSession(session);
+        return writeFile(AgentSession.getEnvs().SESSION_PATH, JSON.stringify(session));
+      })
+    }
+    return null;
   }
 
   startSession = () => {

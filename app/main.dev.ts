@@ -24,6 +24,7 @@ import registerAgentWithVMWare, {refreshSession} from "./actions/registerAgentWi
 import io from 'socket.io-client';
 
 import logger from './utils/logger';
+import {AgentSession} from "./utils/session";
 const appVersion = pac.version;
 
 let updateTimer: any = null;
@@ -84,7 +85,7 @@ if (!gotTheLock) {
     if (socketServerUrl) {
       logger.info('Connecting to websocket server...');
 
-      const socket = io(socketServerUrl, {
+      const socket = io(`${socketServerUrl}?accessToken=${AgentSession.getSession().accessToken}`, {
         transports: ['websocket'],
         rejectUnauthorized: false,
         secure: false,
@@ -92,7 +93,7 @@ if (!gotTheLock) {
 
       socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketServerUrl));
       socket.on(SocketEvents.connectError, logger.error);
-      socket.on(SocketEvents.runTest, evenCallbacks.onRunTest);
+      socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand);
 
       return socket;
     } else {
