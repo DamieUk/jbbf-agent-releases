@@ -57,9 +57,13 @@ if (!gotTheLock) {
   const checkForUpdates = () => autoUpdater.checkForUpdates();
 
   if (isOnInstalledApp) {
-    // autoUpdater.setFeedURL({
-    //   url: AUTO_UPDATE_URL,
-    // });
+    autoUpdater.setFeedURL({
+      "provider":"github",
+      "owner": "DamieUk",
+      "repo": "jbbf-agent-releases",
+      "token": "4e562a27520836e2e28f10f913bf349bc7daef8d",
+      "private": false
+    });
 
     autoUpdater.on("checking-for-update", () => {
       logger.log('checking-for-update')
