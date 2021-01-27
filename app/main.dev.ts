@@ -33,6 +33,7 @@ let updateTimer: any = null;
 
 const isOnInstalledApp = process.env.NODE_ENV !== 'development';
 logger.info(`App is in ${process.env.NODE_ENV} mode`);
+logger.info(`YAY!! we are on new version ${pac.version}`);
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -76,8 +77,8 @@ if (!gotTheLock) {
       quitAndInstall();
     });
 
-    autoUpdater.on("error", (err) => {
-      logger.error('update-error ->> ', err)
+    autoUpdater.on("error", () => {
+      logger.error('New version not found')
     });
 
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 2);
