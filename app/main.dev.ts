@@ -10,8 +10,9 @@
  */
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import {app, autoUpdater} from 'electron';
+import {app} from 'electron';
 import AutoLaunch from 'auto-launch';
+import { autoUpdater } from "electron-updater"
 import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
@@ -23,12 +24,12 @@ import io from 'socket.io-client';
 
 import logger from './utils/logger';
 import {AgentSession} from "./utils/session";
-const appVersion = pac.version;
+// const appVersion = pac.version;
 
 let updateTimer: any = null;
 
-const AUTO_UPDATE_URL =
-  'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
+// const AUTO_UPDATE_URL =
+//   'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
 
 const isOnInstalledApp = process.env.NODE_ENV !== 'development';
 logger.info(`App is in ${process.env.NODE_ENV} mode`);
@@ -41,6 +42,8 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.setName(pac.productName);
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
 
   const quitAndInstall = () => {
     try {
@@ -53,9 +56,9 @@ if (!gotTheLock) {
   const checkForUpdates = () => autoUpdater.checkForUpdates();
 
   if (isOnInstalledApp) {
-    autoUpdater.setFeedURL({
-      url: AUTO_UPDATE_URL,
-    });
+    // autoUpdater.setFeedURL({
+    //   url: AUTO_UPDATE_URL,
+    // });
 
     autoUpdater.on("checking-for-update", () => {
       logger.log('checking-for-update')
