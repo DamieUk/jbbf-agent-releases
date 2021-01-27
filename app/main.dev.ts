@@ -12,8 +12,6 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app, autoUpdater} from 'electron';
 import AutoLaunch from 'auto-launch';
-import fs from 'fs';
-import path from 'path';
 import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
@@ -32,7 +30,8 @@ let updateTimer: any = null;
 const AUTO_UPDATE_URL =
   'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
 
-const isOnInstalledApp = fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'update.exe'));
+const isOnInstalledApp = process.env.NODE_ENV !== 'development';
+logger.info(`App is in ${process.env.NODE_ENV} mode`);
 
 const gotTheLock = app.requestSingleInstanceLock();
 
