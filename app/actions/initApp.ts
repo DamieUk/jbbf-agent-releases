@@ -1,5 +1,6 @@
 import {App} from 'electron';
 import path from 'path';
+import fs from 'fs';
 import {OS_TYPE} from 'os-enums';
 import generateKeys from '../utils/generatePubKey';
 import {getHomePath} from '../enums';
@@ -30,6 +31,7 @@ export default async function initApp<A extends App, O extends OS_TYPE>(app: A, 
       PRIVATE: privateKeyPath,
       PUBLIC: publicKeyPath,
     },
+    SCRIPTS_EXE_FOLDER: `${projectPath}/execScripts`,
     ENV_FILE_PATH: `${projectPath}/agentEnvsLocal.txt`,
     SESSION_PATH: `${projectPath}/agentSessions.txt`,
     ...ENV_VARS,
@@ -38,6 +40,7 @@ export default async function initApp<A extends App, O extends OS_TYPE>(app: A, 
 
   await isFileExist(ALL_ENVS.ENV_FILE_PATH).catch(() => writeFile(`${ALL_ENVS.ENV_FILE_PATH}`, JSON.stringify(ALL_ENVS)));
   await isFileExist(ALL_ENVS.SESSION_PATH).catch(() => writeFile(`${ALL_ENVS.SESSION_PATH}`, ''));
+  !fs.existsSync(ALL_ENVS.SCRIPTS_EXE_FOLDER) && fs.mkdirSync(ALL_ENVS.SCRIPTS_EXE_FOLDER);
 
   return ALL_ENVS;
 }

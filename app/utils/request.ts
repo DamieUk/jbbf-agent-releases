@@ -1,5 +1,5 @@
 // @ts-ignore
-import curl from 'curlrequest';
+import axios from 'axios';
 import {AGENT_API_PREFIX, SCRIPT_SERVER_PREFIX, SOCKET_SERVER_PREFIX} from "../enums";
 import {IAnyShape} from "global-shapes";
 import logger from "./logger";
@@ -20,9 +20,10 @@ const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
 }
 
-const Fetch = (source: REQUEST_SOURCE, method: string) => (_url: string, options: IAnyShape): Promise<any> =>
-  new Promise((resolve, rej) => {
+const Fetch = (source: REQUEST_SOURCE, method: string) => (_url: string, _options?: IAnyShape): Promise<any> =>
+  new Promise((resolve, reject) => {
     const envs = AgentSession.getEnvs();
+    const options = _options || {};
 
     const URL_PATHS = {
       MAIN: `${envs.API_SERVER_URL}${PREFIXES[source]}`,
@@ -33,17 +34,25 @@ const Fetch = (source: REQUEST_SOURCE, method: string) => (_url: string, options
 
     const url = `${URL_PATHS[source]}${_url}`;
     logger.log(`Fetching ${url} ... ${options.data ? `data -> ${JSON.stringify(options.data)}` : ''}`);
-    return curl.request(
-      {url, method, ...{...options, headers: {...DEFAULT_HEADERS, ...options.headers}}},
-      (err: any, data: any) => {
-        if (err) {
-          logger.error(err);
-          return rej(err)
-        }
-        logger.info(`Received data from request ->>>> `, data);
-        resolve(data)
-      }
-    )
+    const headers = {...DEFAULT_HEADERS, ...options.headers};
+
+    const onError = (err: string) => {
+      reject(err);
+      logger.error(`Error on requesting ${method} ${url}`);
+    }
+
+    switch (method) {
+      case 'GET':
+        return axios.get(url, { headers, data: options.data }).then(res => resolve(res.data)).catch(onError);
+      case 'PUT':
+        return axios.put(url, options.data, { headers }).then(res => resolve(res.data)).catch(onError);
+      case 'DELETE':
+        return axios.delete(url, { headers, data: options.data }).then(res => resolve(res.data)).catch(onError);
+      case 'POST':
+        return axios.post(url, options.data, { headers }).then(res => resolve(res.data)).catch(onError);
+      default:
+        return reject('Undefined method')
+    }
   });
 
 const buildCRUD = (source: REQUEST_SOURCE) => ({

@@ -28,5 +28,6 @@ declare module 'env-enums' {
     VM_TOOLS_UTILS: string;
     ENV_FILE_PATH: string;
     SESSION_PATH: string;
+    SCRIPTS_EXE_FOLDER: string;
   }
 }

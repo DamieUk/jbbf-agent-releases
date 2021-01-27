@@ -1,5 +1,7 @@
 /* eslint global-require: off, no-console: off */
 
+import {IAppEnvironments} from "env-enums";
+
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -9,7 +11,6 @@
  * `./app/main.prod.js` using webpack. This gives us some performance wins.
  */
 process.env.GH_TOKEN = 'f206f76883f45b6fa4bf5e21affe64184da73d9f';
-logger.info(process.env);
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app} from 'electron';
@@ -91,19 +92,21 @@ if (!gotTheLock) {
     updateTimer = setInterval(checkForUpdates, 1000 * 60 * 2);
   }
 
-  const initWeSockets = async (socketServerUrl: string | null) => {
-    if (socketServerUrl) {
+  const initWeSockets = async (envs: IAppEnvironments) => {
+    if (envs.SOCKET_SERVER_URL) {
       logger.info('Connecting to websocket server...');
 
-      const socket = io(`${socketServerUrl}?accessToken=${AgentSession.getSession().accessToken}`, {
+      const socketUrl = `${envs.SOCKET_SERVER_URL}?accessToken=${AgentSession.getSession().accessToken}`
+
+      const socket = io(socketUrl, {
         transports: ['websocket'],
         rejectUnauthorized: false,
         secure: false,
       });
 
-      socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketServerUrl));
+      socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketUrl));
       socket.on(SocketEvents.connectError, logger.error);
-      socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand);
+      socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand(envs));
 
       return socket;
     } else {
@@ -135,7 +138,7 @@ if (!gotTheLock) {
 
       await setAppEnvs(ENV_VARS);
       await registerAgentWithVMWare(ENV_VARS);
-      await initWeSockets(ENV_VARS.SOCKET_SERVER_URL);
+      await initWeSockets(ENV_VARS);
     }
 
 
