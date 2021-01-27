@@ -1,3 +1,4 @@
+import fs from "fs";
 import logger from '../utils/logger';
 import {IAnyShape} from "global-shapes";
 import {request} from "../utils/request";
@@ -25,6 +26,12 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
       const scriptPath: string = await downloadScript(envs.SCRIPT_SERVER_URL + scriptData.filePath, `${envs.SCRIPTS_EXE_FOLDER}/${scriptData.fileName}`);
       await executeScript(scriptPath, commandParams);
       await request.apiServer.POST(`/agent-jobs/${jobId}/complete`);
+      fs.unlink(scriptPath, (err) => { // remove executed script file,
+        if (err) {
+          console.log(`Script file ${scriptPath} doesnt exist already`);
+          return;
+        }
+      })
     } catch (e) {
       logger.error(e)
     }
