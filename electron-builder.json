@@ -45,12 +45,5 @@
   },
   "extraResources": [
     "./resources/**"
-  ],
-  "publish": {
-    "provider": "github",
-    "owner": "DamieUk",
-    "repo": "jbbf-agent-releases",
-    "token": "f206f76883f45b6fa4bf5e21affe64184da73d9f",
-    "private": false
-  }
+  ]
 }

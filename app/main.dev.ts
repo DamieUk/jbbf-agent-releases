@@ -27,16 +27,16 @@ import io from 'socket.io-client';
 
 import logger from './utils/logger';
 import {AgentSession} from "./utils/session";
-// const appVersion = pac.version;
+const appVersion = pac.version;
 
 let updateTimer: any = null;
 
-// const AUTO_UPDATE_URL =
-//   'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
+const AUTO_UPDATE_URL =
+  'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
 
 const isOnInstalledApp = process.env.NODE_ENV !== 'development';
 logger.info(`App is in ${process.env.NODE_ENV} mode`);
-logger.info(`YAY!! we are on new version ${pac.version}`);
+logger.info(`YAY!! we are on new version ${appVersion}`);
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -61,9 +61,8 @@ if (!gotTheLock) {
 
   if (isOnInstalledApp) {
     autoUpdater.setFeedURL({
-      "provider": "github",
-      "owner": "DamieUk",
-      "repo": "jbbf-agent-releases",
+      "provider": "generic",
+      "url": AUTO_UPDATE_URL,
       "token": "f206f76883f45b6fa4bf5e21affe64184da73d9f",
       "private": false
     });
