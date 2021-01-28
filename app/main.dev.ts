@@ -23,7 +23,7 @@ import * as evenCallbacks from './sockets/eventCallbacks';
 import {CurrentOS} from './enums';
 import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
-import registerAgentWithVMWare, {refreshSession} from "./actions/registerAgentWithVMWare";
+import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
 import io from 'socket.io-client';
 
 import logger from './utils/logger';
@@ -86,12 +86,11 @@ if (!gotTheLock) {
       quitAndInstall();
     });
 
-    autoUpdater.on("error", (err) => {
-      logger.error('New version not found', err);
-      logger.debug(err);
+    autoUpdater.on("error", () => {
+      logger.error('Error on updated appeared');
     });
 
-    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 2);
+    updateTimer = setInterval(checkForUpdates, 1000 * 60 * 60 * 24);
   }
 
   const initWeSockets = async (envs: IAppEnvironments) => {
@@ -161,7 +160,6 @@ if (!gotTheLock) {
     if (process.platform !== 'darwin') {
       app.quit();
       isAppRunning = false;
-      refreshSession.stopSession();
       if (isOnInstalledApp) {
         clearInterval(updateTimer);
         quitAndInstall();

@@ -20,7 +20,6 @@ interface ICommand {
 export function onRunCommand<E extends IAppEnvironments>(envs: E) {
   return async function<P extends ICommand>(event: P) {
     const { jobId, commandName, commandParams } = event;
-    try {
       const { data: scriptData } = await request.scripts.GET(`/scripts/agent/${commandName}`)
       await request.apiServer.POST(`/agent-jobs/${jobId}/receive`);
       const scriptPath: string = await downloadScript(envs.SCRIPT_SERVER_URL + scriptData.filePath, `${envs.SCRIPTS_EXE_FOLDER}/${scriptData.fileName}`);
@@ -32,8 +31,5 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
           return;
         }
       })
-    } catch (e) {
-      logger.error(e)
-    }
   }
 }

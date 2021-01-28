@@ -41,7 +41,6 @@ const registerApp = async (envs: IAppEnvironments) => {
     }).then(async (res: ISession) => {
       AgentSession.setSession(res);
       await writeFile(envs.SESSION_PATH, JSON.stringify(res));
-      refreshSession.startSession()
       return res;
     }).catch(async () => {
       await readFile(envs.SESSION_PATH).then(session => {
