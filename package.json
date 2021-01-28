@@ -45,37 +45,13 @@
     "email": "electronreactboilerplate@gmail.com",
     "url": "https://electron-react-boilerplate.js.org"
   },
-  "contributors": [
-    {
-      "name": "Vikram Rangaraj",
-      "email": "vikr01@icloud.com",
-      "url": "https://github.com/vikr01"
-    },
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
-    }
-  ],
+  "contributors": [],
   "license": "MIT",
   "bugs": {
     "url": "https://git.jbbf.ch/jbbf/jbbf-automation-agent/-/issues"
   },
   "keywords": [
     "electron",
-    "boilerplate",
-    "react",
-    "redux",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
     "reload"
   ],
   "devDependencies": {

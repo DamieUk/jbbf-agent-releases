@@ -9,6 +9,11 @@
     "main.prod.js.map",
     "package.json"
   ],
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "include": "build/installer.nsh"
+  },
   "dmg": {
     "contents": [
       {
