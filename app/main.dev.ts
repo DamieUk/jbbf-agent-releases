@@ -10,7 +10,8 @@ import {IAppEnvironments} from "env-enums";
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./app/main.prod.js` using webpack. This gives us some performance wins.
  */
-process.env.GH_TOKEN = 'f206f76883f45b6fa4bf5e21affe64184da73d9f';
+const ghToken = 'f206f76883f45b6fa4bf5e21affe64184da73d9f';
+process.env.GH_TOKEN = ghToken;
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app} from 'electron';
@@ -63,9 +64,11 @@ if (!gotTheLock) {
     autoUpdater.setFeedURL({
       "provider": "generic",
       "url": AUTO_UPDATE_URL,
-      "token": "f206f76883f45b6fa4bf5e21affe64184da73d9f",
-      "private": false
+      "token": ghToken,
+      "private": false,
     });
+
+    autoUpdater.requestHeaders = { "PRIVATE-TOKEN": ghToken  };
 
     autoUpdater.on("checking-for-update", () => {
       logger.log('checking-for-update')
