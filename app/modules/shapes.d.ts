@@ -3,6 +3,8 @@ declare module 'global-shapes' {
     [field: string]: any;
   }
 
+  export type IAnyFunc = (...args: any) => any;
+
   export interface ISession {
     accessToken: string;
     refreshToken: string;

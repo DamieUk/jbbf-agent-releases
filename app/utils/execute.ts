@@ -1,4 +1,4 @@
-import {execFile, exec, spawn} from "child_process";
+import {exec, execFile, spawn} from "child_process";
 import logger from "./logger";
 import {IAnyShape} from "global-shapes";
 import fs from "fs";
@@ -50,7 +50,7 @@ export function execute<C extends string>(command: C): Promise<string> {
  */
 export function executeProgram(filePath: string, params?: any): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile(filePath, params, { shell: true }, (err: any, data: any) => {
+    execFile(filePath, params, {shell: true}, (err: any, data: any) => {
       if (err) {
         return reject(err);
       }
@@ -59,32 +59,31 @@ export function executeProgram(filePath: string, params?: any): Promise<string> 
   });
 }
 
+export function executeScript<S extends string, P extends IAnyShape>(path: S, params?: P): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const allParams: string[] = [];
+    const paramsKeys: string[] = params ? Object.keys(params) : [];
+    if (paramsKeys.length) {
+      paramsKeys.forEach(key => {
+        if (params) {
+          allParams.push(`-${key} ${params[key]}`);
+        }
+      })
+    }
+    const cp = spawn("powershell.exe", [path, ...allParams]);
+    logger.info(`Executing script ${path} with params ${JSON.stringify(allParams)}`);
 
-export function executeScript<S extends string, P extends IAnyShape> (path: S, params?: P): Promise<any> {
- return new Promise((resolve, reject) => {
-   const allParams: string[] = [];
-   const paramsKeys: string[] = params ? Object.keys(params) : [];
-   if (paramsKeys.length) {
-     paramsKeys.forEach(key => {
-       if (params) {
-         allParams.push(`-${key} ${params[key]}`);
-       }
-     })
-   }
-   const cp = spawn("powershell.exe",[path, ...allParams]);
-   logger.info(`Executing script ${path} with params ${JSON.stringify(allParams)}`);
-
-   cp.stdout.on("data", (data: any) => {
-     resolve(data);
-   });
-   cp.stderr.on("data", (data: any) => {
-     reject(data)
-   });
-   cp.on("exit",function(){
-     logger.info(`Script execution of ${path} is finished`);
-   });
-   cp.stdin.end();
- })
+    cp.stdout.on("data", (data: any) => {
+      resolve(data);
+    });
+    cp.stderr.on("data", (data: any) => {
+      reject(data)
+    });
+    cp.on("exit", function () {
+      logger.info(`Script execution of ${path} is finished`);
+    });
+    cp.stdin.end();
+  })
 }
 
 export const downloadScript = (url: string, dest: string): Promise<string> => {
