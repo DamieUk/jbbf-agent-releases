@@ -12,6 +12,7 @@ import {IAppEnvironments} from "env-enums";
  */
 const ghToken = 'f206f76883f45b6fa4bf5e21affe64184da73d9f';
 process.env.GH_TOKEN = ghToken;
+process.env.USE_HARD_LINKS = false;
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import {app} from 'electron';
