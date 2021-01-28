@@ -72,7 +72,5 @@ export const pullEnvVarsFromVMTools = async (): Promise<IDynamicEnvVars> => {
     logger.error('Could not get agent environment variables. Please, check if vmtoolsd service working properly or installed', err)
   }
 
-  allEnvs.API_SERVER_URL = 'http://api-dev.jbbf.ch'
-
   return allEnvs;
 }
