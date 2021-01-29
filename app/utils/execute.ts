@@ -66,18 +66,19 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
     if (paramsKeys.length) {
       paramsKeys.forEach(key => {
         if (params) {
-          allParams.push(`-${key} ${params[key]}`);
+          allParams.push(`"-${key} ${params[key]}"`);
         }
       })
     }
-    const cp = spawn("powershell.exe", [path, ...allParams]);
-    logger.info(`Executing script ${path} with params ${JSON.stringify(allParams)}`);
+    const command = `powershell.exe "${path}" ${allParams.join(' ')}`;
+    const cp = spawn(command);
+    logger.info(`Executing command ->>>> ${command}`);
 
     cp.stdout.on("data", (data: any) => {
-      resolve(data);
+      resolve(data.toString('utf8'));
     });
     cp.stderr.on("data", (data: any) => {
-      reject(data)
+      reject(data.toString('utf8'))
     });
     cp.on("exit", function () {
       logger.info(`Script execution of ${path} is finished`);
