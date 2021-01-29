@@ -47,7 +47,7 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
       try {
         await request.apiServer.POST(
         `/agent-jobs/${jobId}/complete`,
-        {data: error ? { error } : { message }}
+        {data: error ? { error: { message: error, stacktrace: '' } } : { data: { message } }}
         );
       } catch (er) {
         logger.error(`Failed to complete job - ${jobId}. -> `, er)
