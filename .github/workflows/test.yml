@@ -28,10 +28,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           yarn package-ci
-
-      # TODO: Testcafe e2e are broken because of:
-      # https://github.com/DevExpress/testcafe/issues/4512
-      # Tests are currently broken on linux and macos
-      - if: matrix.os == 'windows-latest'
-        run: |
-          yarn test-e2e
