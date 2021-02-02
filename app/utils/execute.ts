@@ -1,6 +1,8 @@
-import {exec, execFile, spawn} from "child_process";
+import {exec, execFile} from "child_process";
 import logger from "./logger";
 import {IAnyShape} from "global-shapes";
+// @ts-ignore
+import Shell from "node-powershell";
 import fs from "fs";
 import http from "http";
 
@@ -61,29 +63,40 @@ export function executeProgram(filePath: string, params?: any): Promise<string> 
 
 export function executeScript<S extends string, P extends IAnyShape>(path: S, params?: P): Promise<any> {
   return new Promise((resolve, reject) => {
-    const allParams: string[] = [];
+    const allParams: IAnyShape[] = [];
+    const paramsInfo: string[] = [];
     const paramsKeys: string[] = params ? Object.keys(params) : [];
     if (paramsKeys.length) {
       paramsKeys.forEach(key => {
         if (params) {
-          allParams.push(`"-${key} ${params[key]}"`);
+          paramsInfo.push(`-${key} ${params[key]}`)
+          allParams.push({ name: key, value: params[key] });
         }
       })
     }
-    const command = `powershell.exe "${path}" ${allParams.join(' ')}`;
-    const cp = spawn(command);
-    logger.info(`Executing command ->>>> ${command}`);
 
-    cp.stdout.on("data", (data: any) => {
-      resolve(data.toString('utf8'));
+    const command = `${path} ${paramsInfo.join(' ')}`;
+    logger.info(`Executing script ->>>> ${command}`);
+
+    const ps = new Shell({
+      executionPolicy: 'Bypass',
+      noProfile: true
     });
-    cp.stderr.on("data", (data: any) => {
-      reject(data.toString('utf8'))
-    });
-    cp.on("exit", function () {
-      logger.info(`Script execution of ${path} is finished`);
-    });
-    cp.stdin.end();
+      ps.addCommand(`& "${path}"`)
+        .then(() => ps.addParameters(allParams))
+        .then(() => {
+          return ps.invoke()
+            .then((response:any) => {
+              const message = JSON.stringify(response);
+              logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
+              resolve(message);
+            })
+            .catch((err: any) => {
+              logger.info(`Command ->>> ${command} -<<< Failed execution. -----`, err)
+              reject(err);
+              ps.dispose();
+            });
+        })
   })
 }
 

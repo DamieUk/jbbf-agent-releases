@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import {generateKeyPair, verify, constants, sign} from 'crypto';
+import {generateKeyPair} from 'crypto';
 import {AgentSession} from './session';
 import logger from './logger';
 import { writeFile } from './files';
@@ -30,16 +30,14 @@ export default function generateKeys(projectPath: string): Promise<IResponse> {
         generateKeyPair(
           "rsa",
           {
-            modulusLength: 2048, // It holds a number. It is the key size in bits and is applicable for RSA, and DSA algorithm only.
+            modulusLength: 2048,
             publicKeyEncoding: {
-              type: "pkcs1", //Note the type is pkcs1 not spki
+              type: "pkcs1",
               format: "pem",
             },
             privateKeyEncoding: {
-              type: "pkcs1", //Note again the type is set to pkcs1
+              type: "pkcs1",
               format: "pem",
-              // cipher: "aes-256-cbc", //Optional
-              // passphrase: "", //Optional
             },
           },
           async (_err, publicKey, privateKey) => {
@@ -54,29 +52,6 @@ export default function generateKeys(projectPath: string): Promise<IResponse> {
 
             await writeFile(publicKeyPath, publicKey)
               .catch(err => logger.error(`Error while creating public key file --->>> `, err));
-
-            const verifiableData = "this need to be verified";
-
-
-            const signature = sign("sha256", Buffer.from(verifiableData),
-              {
-                key: privateKey,
-                padding: require("crypto").constants.RSA_PKCS1_PSS_PADDING,
-              });
-
-
-            const isVerified = verify(
-              "sha256",
-              Buffer.from(verifiableData),
-              {
-                key: publicKey,
-                padding: constants.RSA_PKCS1_PSS_PADDING,
-              },
-              Buffer.from(signature.toString("base64"), "base64")
-            );
-
-            // isVerified should be `true` if the signature is valid
-            logger.info("public signature is verified ->>> ", isVerified);
 
             AgentSession.setEnvs({
               publicKey: publicKey

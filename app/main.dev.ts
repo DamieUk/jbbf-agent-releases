@@ -60,6 +60,7 @@ let isAppRunning = false;
 const initWeSockets = async (envs: IAppEnvironments) => {
   if (envs.SOCKET_SERVER_URL) {
     logger.info('Connecting to websocket server...');
+    console.log(AgentSession.getSession())
 
     const socketUrl = `${envs.SOCKET_SERVER_URL}?accessToken=${AgentSession.getSession().accessToken}`
 
@@ -85,7 +86,7 @@ const runApp = async () => {
 
     logger.info('Starting app...');
     logger.info(`App Version: ${pac.version}`);
-    await createFolders()
+    await createFolders();
 
     const ENV_VARS = await InitApp(CurrentOS);
 

@@ -4,6 +4,7 @@ import {IAnyShape} from "global-shapes";
 import {request} from "../utils/request";
 import {downloadScript, executeScript} from "../utils/execute";
 import {IAppEnvironments} from "env-enums";
+import path from "path";
 
 export function onConnect(url: string) {
   return () => logger.info(
@@ -23,7 +24,7 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
     const {data: scriptData} = await request.scripts.GET(`/scripts/agent/${commandName}`);
     const scriptPath: string = await downloadScript(
       envs.SCRIPT_SERVER_URL + scriptData.filePath,
-      `${envs.SCRIPTS_EXE_FOLDER}/${scriptData.fileName}`
+      path.resolve(envs.SCRIPTS_EXE_FOLDER, scriptData.fileName)
     );
     if (!scriptPath) {
       logger.error(`${scriptData.fileName} couldn't be found. Script execution is stopped.`);

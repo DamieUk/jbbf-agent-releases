@@ -1,8 +1,9 @@
 import {IAppEnvironments} from "env-enums";
 import {request} from "../utils/request";
 import {AgentSession} from "../utils/session";
-import {readFile, writeFile} from "../utils/files";
+import {isFileExist, readFile, writeFile} from "../utils/files";
 import {ISession} from "global-shapes";
+import {session} from "electron";
 
 class RefreshSession {
   timer: any = undefined;
@@ -32,8 +33,16 @@ class RefreshSession {
 export const refreshSession = new RefreshSession();
 
 const registerApp = async (envs: IAppEnvironments) => {
-  if (envs.AGENT_TOKEN) {
-    return await request.apiServer.PUT('/agent-auth/verify', {
+  const isSessionCreated = await isFileExist(envs.SESSION_PATH);
+
+  if (isSessionCreated) {
+    await readFile(envs.SESSION_PATH).then(session => {
+      return AgentSession.setSession(JSON.parse(session))
+    })
+  }
+
+  if (envs.AGENT_TOKEN && !isSessionCreated) {
+    return request.apiServer.PUT('/agent-auth/verify', {
       data: {
         token: envs.AGENT_TOKEN,
         publicKey: AgentSession.getEnvs().publicKey
@@ -42,11 +51,6 @@ const registerApp = async (envs: IAppEnvironments) => {
       AgentSession.setSession(res);
       await writeFile(envs.SESSION_PATH, JSON.stringify(res));
       return res;
-    }).catch(async () => {
-      console.log(envs.SESSION_PATH)
-      await readFile(envs.SESSION_PATH).then(session => {
-        return AgentSession.setSession(JSON.parse(session))
-      })
     })
   }
   return;
