@@ -1,1 +1,0 @@
-open https://stackoverflow.com

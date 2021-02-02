@@ -1,5 +1,12 @@
-import log from 'electron-log';
+// @ts-ignore
+import { createSimpleLogger } from 'simple-node-logger';
+import { PROJECT_PATH } from '../enums';
+import path from 'path';
 
-log.info(`Logs are placed in "${log.transports.file.file}"`);
+const LOGS_PATH = (path.resolve(PROJECT_PATH, 'logs', 'main.log'));
 
-export default log;
+const logger = createSimpleLogger(LOGS_PATH)
+logger.info(`Logs are placed in "${LOGS_PATH}"`);
+
+
+export default logger;

@@ -1,6 +1,8 @@
 import {OS_TYPE} from "os-enums";
 import { execute } from '../utils/execute';
 import logger from "../utils/logger";
+import path from "path";
+import { productName } from "../package.json";
 
 export const getHomePath = async (os: OS_TYPE): Promise<string> => {
   let command: string = 'echo %USERPROFILE%';
@@ -16,4 +18,6 @@ export const getHomePath = async (os: OS_TYPE): Promise<string> => {
 
   return path;
 }
+
+export const PROJECT_PATH = path.resolve('C:/Program Files', productName);
 

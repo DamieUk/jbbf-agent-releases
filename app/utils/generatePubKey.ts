@@ -1,3 +1,4 @@
+import path from 'path';
 import fs from 'fs';
 import {generateKeyPair, verify, constants, sign} from 'crypto';
 import {AgentSession} from './session';
@@ -11,9 +12,9 @@ interface IResponse {
 }
 
 export default function generateKeys(projectPath: string): Promise<IResponse> {
-  const keysDirPath = `${projectPath}/publicKeys`;
-  const publicKeyPath = `${keysDirPath}/id_rsa.pub`;
-  const privateKeyPath = `${keysDirPath}/id_rsa`;
+  const keysDirPath = path.resolve(projectPath, 'publicKeys');
+  const publicKeyPath = path.resolve(keysDirPath, 'id_rsa.pub');
+  const privateKeyPath = path.resolve(keysDirPath, 'id_rsa');
 
   return new Promise((resolve, reject) => {
     fs.access(publicKeyPath, undefined, async (err) => {
