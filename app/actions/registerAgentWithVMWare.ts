@@ -3,7 +3,6 @@ import {request} from "../utils/request";
 import {AgentSession} from "../utils/session";
 import {isFileExist, readFile, writeFile} from "../utils/files";
 import {ISession} from "global-shapes";
-import {session} from "electron";
 
 class RefreshSession {
   timer: any = undefined;

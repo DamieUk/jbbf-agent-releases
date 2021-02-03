@@ -17,7 +17,7 @@ import fs from 'fs';
 import pac from './package.json';
 import {SocketEvents} from './sockets/constants';
 import * as evenCallbacks from './sockets/eventCallbacks';
-import {CurrentOS, PROJECT_PATH} from './enums';
+import {CurrentOS, PROJECT_PATH, PROJECT_LOGS_PATH, PROGRAM_DATA_PATH} from './enums';
 import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
 import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
@@ -46,21 +46,21 @@ const createFolders = () => {
       if (err) rej(err);
     });
 
-    fs.mkdir(path.resolve(PROJECT_PATH, 'logs'), { recursive: true }, (err) => {
+    fs.mkdir(path.resolve(PROGRAM_DATA_PATH), { recursive: true }, (err) => {
       if (err) rej(err);
-      res(true)
+      fs.mkdir(path.resolve(PROJECT_LOGS_PATH), { recursive: true }, (err) => {
+        if (err) rej(err);
+        res(true)
+      });
     });
   })
 }
 
-
 let isAppRunning = false;
-
 
 const initWeSockets = async (envs: IAppEnvironments) => {
   if (envs.SOCKET_SERVER_URL) {
     logger.info('Connecting to websocket server...');
-    console.log(AgentSession.getSession())
 
     const socketUrl = `${envs.SOCKET_SERVER_URL}?accessToken=${AgentSession.getSession().accessToken}`
 

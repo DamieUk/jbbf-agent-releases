@@ -20,4 +20,6 @@ export const getHomePath = async (os: OS_TYPE): Promise<string> => {
 }
 
 export const PROJECT_PATH = path.resolve('C:/Program Files', productName);
+export const PROGRAM_DATA_PATH = path.resolve('C:/ProgramData', productName);
+export const PROJECT_LOGS_PATH = path.resolve(PROGRAM_DATA_PATH, 'logs');
 

@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import {OS_TYPE} from 'os-enums';
 import generateKeys from '../utils/generatePubKey';
-import {getHomePath, PROJECT_PATH} from '../enums';
+import {getHomePath, PROJECT_LOGS_PATH, PROJECT_PATH, PROGRAM_DATA_PATH} from '../enums';
 import {pullEnvVarsFromVMTools, setEnvVars} from "../utils/setEnvVars";
 import {isFileExist, writeFile} from "../utils/files";
 import {IAppEnvironments} from "env-enums";
@@ -20,9 +20,9 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
     HOME,
     APP_NAME: appName,
     LOGS: {
-      LINUX: path.resolve(PROJECT_PATH, 'logs'),
-      MAC: path.resolve(PROJECT_PATH, 'logs'),
-      WINDOWS: path.resolve(PROJECT_PATH, 'logs'),
+      LINUX: PROJECT_LOGS_PATH,
+      MAC: PROJECT_LOGS_PATH,
+      WINDOWS: PROJECT_LOGS_PATH,
     },
     PROJECT_PATH: PROJECT_PATH,
     AUTH_KEYS_PATH: {
@@ -32,7 +32,7 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
     },
     SCRIPTS_EXE_FOLDER: path.resolve(PROJECT_PATH, 'execScripts'),
     ENV_FILE_PATH: path.resolve(PROJECT_PATH, 'agentEnvsLocal.txt'),
-    SESSION_PATH: path.resolve(PROJECT_PATH, 'agentSessions.txt'),
+    SESSION_PATH: path.resolve(PROGRAM_DATA_PATH, 'agentSessions.txt'),
     ...ENV_VARS,
     ...DYNAMIC_ENV_VARS,
   };
