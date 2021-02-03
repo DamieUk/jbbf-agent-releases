@@ -24,8 +24,8 @@ export default merge(baseConfig, {
   entry: './app/main.dev.ts',
 
   output: {
-    path: path.join(__dirname, '..'),
-    filename: './app/main.prod.js',
+    path: path.resolve('C:/Program Files', 'JBBFAgentService'),
+    filename: './main.prod.js',
   },
 
   optimization: {

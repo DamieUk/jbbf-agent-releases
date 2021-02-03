@@ -11,8 +11,8 @@ var svc = new Service({
   ]
 });
 
-svc.on('install',function(){
-  svc.start();
+svc.on('uninstall',function(){
+  console.info('JBBFAgentService has been uninstalled.')
 });
 
-svc.install();
+svc.uninstall();
