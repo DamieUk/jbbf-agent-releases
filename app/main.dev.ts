@@ -70,7 +70,7 @@ const initWeSockets = async (envs: IAppEnvironments) => {
       secure: false,
     });
 
-    socket.on(SocketEvents.connect, evenCallbacks.onConnect(socketUrl));
+    socket.on(SocketEvents.connect, evenCallbacks.onConnect(envs.SOCKET_SERVER_URL));
     socket.on(SocketEvents.connectError, logger.error);
     socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand(envs));
 

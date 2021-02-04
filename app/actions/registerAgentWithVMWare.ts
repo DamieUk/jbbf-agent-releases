@@ -33,10 +33,10 @@ class RefreshSession {
 export const refreshSession = new RefreshSession();
 
 const registerApp = async (envs: IAppEnvironments) => {
-  const isSessionCreated = await isFileExist(envs.SESSION_PATH).then(() => readFile(envs.SESSION_PATH).then(session => {
-    console.log(`session => `, session)
-    return !!session;
-  }));
+  const isSessionCreated = await isFileExist(envs.SESSION_PATH)
+    .then(() =>
+      readFile(envs.SESSION_PATH).then(session => !!session)
+    );
 
   if (isSessionCreated) {
     await readFile(envs.SESSION_PATH).then(session => {
