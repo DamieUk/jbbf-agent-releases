@@ -12,9 +12,9 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
   const HOME = await getHomePath(os);
   const ENV_VARS = await setEnvVars(os);
   const appName = productName;
-  const {privateKeyPath, publicKeyPath, keysDirPath} = await generateKeys(PROJECT_PATH);
 
   const DYNAMIC_ENV_VARS = await pullEnvVarsFromVMTools();
+  const {privateKeyPath, publicKeyPath, keysDirPath} = await generateKeys(PROJECT_PATH, DYNAMIC_ENV_VARS.VM_ID);
 
   const ALL_ENVS = {
     HOME,

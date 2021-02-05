@@ -26,7 +26,7 @@ export function execute<C extends string>(command: C): Promise<string> {
      */
     exec(command, (error, standardOutput: string, standardError: string) => {
       if (error) {
-        reject();
+        reject(error);
 
         return;
       }
