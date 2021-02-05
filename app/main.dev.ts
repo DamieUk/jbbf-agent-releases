@@ -1,6 +1,7 @@
 /* eslint global-require: off, no-console: off */
 
 import {IAppEnvironments} from "env-enums";
+import express from "express";
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -102,4 +103,9 @@ const runApp = async () => {
   return isAppRunning;
 };
 
-runApp().then(() => logger.info('App is started'));
+const app = express();
+
+app.listen(4000,() => {
+  runApp().then(() => logger.info('App is started'));
+})
+
