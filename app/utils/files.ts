@@ -11,7 +11,7 @@ export const readFile = (path: string): Promise<string> => new Promise((res, rej
   })
 });
 
-export const writeFile = (path: string, data: string): Promise<typeof  data> => new Promise((res, rej) => {
+export const writeFile = (path: string, data: any): Promise<typeof  data> => new Promise((res, rej) => {
   fs.writeFile(path, data, (err) => {
     if (err) {
       rej(err);
