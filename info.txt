@@ -1,0 +1,1 @@
+New-SelfSignedCertificate -DnsName "dc01.symotion.test-me4.ch" -CertStoreLocation "cert:\LocalMachine\My" -KeyUsage KeyEncipherment,DataEncipherment, KeyAgreement -Type DocumentEncryptionCert
