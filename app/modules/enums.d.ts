@@ -22,7 +22,8 @@ declare module 'env-enums' {
     },
     AUTH_KEYS_PATH: {
       ROOT: string;
-      PUBLIC: string;
+      CERT: string;
+      PFX: string;
       PRIVATE: string;
     };
     VM_TOOLS_UTILS: string;

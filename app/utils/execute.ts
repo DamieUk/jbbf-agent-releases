@@ -70,7 +70,7 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
       paramsKeys.forEach(key => {
         if (params) {
           paramsInfo.push(`-${key} ${params[key]}`)
-          allParams.push({ name: key, value: params[key] });
+          allParams.push({name: key, value: params[key]});
         }
       })
     }
@@ -82,21 +82,22 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
       executionPolicy: 'Bypass',
       noProfile: true
     });
-      ps.addCommand(`& "${path}"`)
-        .then(() => ps.addParameters(allParams))
-        .then(() => {
-          return ps.invoke()
-            .then((response:any) => {
-              const message = JSON.stringify(response);
-              logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
-              resolve(message);
-            })
-            .catch((err: any) => {
-              logger.info(`Command ->>> ${command} -<<< Failed execution. -----`, err)
-              reject(err);
-              ps.dispose();
-            });
-        })
+    ps.addCommand(`& "${path}"`)
+      // @ts-ignore
+      .then(() => allParams.length && ps.addParameters(allParams))
+      .then(() => {
+        return ps.invoke()
+          .then((response: any) => {
+            const message = JSON.stringify(response);
+            logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
+            resolve(message);
+          })
+          .catch((err: any) => {
+            logger.info(`Command ->>> ${command} -<<< Failed execution. -----`, err)
+            reject(err);
+            ps.dispose();
+          });
+      })
   })
 }
 

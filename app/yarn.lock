@@ -2,36 +2,6 @@
 # yarn lockfile v1
 
 
-"@chilkat/ck-node14-arm@^9.50.85":
-  version "9.50.85"
-  resolved "https://registry.yarnpkg.com/@chilkat/ck-node14-arm/-/ck-node14-arm-9.50.85.tgz#6833f6b7611fbdb8bd352db17b24ae6d1c4a73f3"
-  integrity sha512-JHmKZg9t4Mji7nf9/E3eX5+31MXkvAAq7tXsxlUCyn7py5aipGlDHcZgtm88hLzqSXUePj5DOB6FW1C2hPkwsA==
-
-"@chilkat/ck-node14-linux64@^9.50.85":
-  version "9.50.85"
-  resolved "https://registry.yarnpkg.com/@chilkat/ck-node14-linux64/-/ck-node14-linux64-9.50.85.tgz#1c66b341da596859f68ee0b227b5c2c7e574cceb"
-  integrity sha512-vk/dMkNC7aZySCiJYfyL0IwEahWArCZon9QouanKybnHmBCBgQiFbQkZLu877HZXbsSmWwVNZmpPV4vX5sVfXA==
-
-"@chilkat/ck-node14-macosx@^9.50.85":
-  version "9.50.85"
-  resolved "https://registry.yarnpkg.com/@chilkat/ck-node14-macosx/-/ck-node14-macosx-9.50.85.tgz#9633436660734456deb46da2d2a8f0880bd9c7f3"
-  integrity sha512-ni43ASxjUcySCOIJgRVwKwkhsak8cU+tCCepOa+IINxvEzKTe1hsXWJJRs/kbcr9LZvdLgIrxfYaWm2M5i+k1Q==
-
-"@chilkat/ck-node14-win-ia32@^9.50.85":
-  version "9.50.85"
-  resolved "https://registry.yarnpkg.com/@chilkat/ck-node14-win-ia32/-/ck-node14-win-ia32-9.50.85.tgz#8b6f8383f69d294d02fa560a8bd66eed5c1c6bbd"
-  integrity sha512-ip8/Q/m4/MXJDG8oAFQRA0SwwfKb/laK52l8yrKQ4Ge7NLZRhXPtiZeeat5mn2oHByi/qtVXv0n5ivb4Nz0sXQ==
-
-"@chilkat/ck-node14-win64@^9.50.85":
-  version "9.50.85"
-  resolved "https://registry.yarnpkg.com/@chilkat/ck-node14-win64/-/ck-node14-win64-9.50.85.tgz#356e72ffe86f1b352d3a487d0befbc4d44fca1e0"
-  integrity sha512-XC1U3X0GY9WbBuoO/0O1kt/xjg08XiCF6Zvb6iMwkSa28eirgefwBzgmnIkA2a8orb2X9HMArrF8EZeA/c+YCQ==
-
-"@types/auto-launch@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@types/auto-launch/-/auto-launch-5.0.1.tgz#388a047edc0e754d8e8978cbd9ed4672b36be2c4"
-  integrity sha512-+KQ+/koZ7sJXnf5cnCANofY6yXAdYJNEoVZEuWcwJfuWbUp9u6l09I7KhwD+ivU+cdz7JId4V5ukxscWtHdSuw==
-
 "@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
@@ -75,6 +45,13 @@
   version "0.9.7"
   resolved "https://registry.yarnpkg.com/@types/node-forge/-/node-forge-0.9.7.tgz#948f7b52d352a6c4ab22d3328c206f0870672db5"
   integrity sha512-AX7Mqk5ztzSvxqsA/q8y0k0/znJpW6QAqnoLQMEi7A3tio+laRmC/8Q3gbATHT4kZnvhnDmGAy1CpWFzlzCfeA==
+  dependencies:
+    "@types/node" "*"
+
+"@types/node-powershell@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@types/node-powershell/-/node-powershell-3.1.1.tgz#20dbb61b80b57df9ef2031211ed1e971ad8e5fcc"
+  integrity sha512-TpFjc4uSvXWkEaoWDSOc9TrAzxNMqEz5e4bYNkXjnDh/SH7OVTmPAbaX6dK9Y3ToE5qE/m9b0c2nAgs/5AB47Q==
   dependencies:
     "@types/node" "*"
 
@@ -526,6 +503,11 @@ node-forge@^0.10.0:
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
   integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==
 
+node-forge@^0.9.1:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.2.tgz#b35a44c28889b2ea55cabf8c79e3563f9676190a"
+  integrity sha512-naKSScof4Wn+aoHU6HBsifh92Zeicm1GDQKd1vp3Y/kOi8ub0DozCa9KpvYNCXslFHYRmLNiqRopGdTGwNLpNw==
+
 node-powershell@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/node-powershell/-/node-powershell-4.0.0.tgz#f3a0b1ec4f5619b501b66005f8a663c8373e8da8"
@@ -549,6 +531,16 @@ on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
+openssl-nodejs-promise@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/openssl-nodejs-promise/-/openssl-nodejs-promise-0.0.4.tgz#645aec0992a551f9f7730a58e2c4672ca2503b97"
+  integrity sha512-1hRzhPpL4Aw+xE8nxbalTA1mN77HZwsQOnmvn/4IkMCNhCI5opkijg1UraIiIm4aLMAJ2Sbi2QAzvYFw1zcKOQ==
+
+openssl-nodejs@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/openssl-nodejs/-/openssl-nodejs-1.0.5.tgz#2249073693eabf5c5b33620eece4bf00bf1f914d"
+  integrity sha512-6+nxZBw96nK1WUk5yIjhv9NRjqtNTfklB508T64BG5TQ8fU1x1rJrc1I3iVW+31KjnYYYwInGTopYxFJa7wMqA==
+
 optimist@~0.6.0:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
@@ -561,6 +553,13 @@ os@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/os/-/os-0.1.1.tgz#208845e89e193ad4d971474b93947736a56d13f3"
   integrity sha1-IIhF6J4ZOtTZcUdLk5R3NqVtE/M=
+
+p12-pem@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/p12-pem/-/p12-pem-1.0.4.tgz#d22eaf5b0dc0d04642bbec1afba2d549a67dfc7a"
+  integrity sha512-aUN6DGxgtqHKcSKQpEV1sinJAIckQsI8UWWdSm/Y0lKTz8nInRc5RTKkz4ZRqAi60lON1FoRvDSDknas4/pCeg==
+  dependencies:
+    node-forge "^0.9.1"
 
 parseqs@0.0.6:
   version "0.0.6"
