@@ -56,9 +56,9 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
       return removeSavedScriptFile();
     }
 
-    return await executeScript(scriptPath, commandParams)
+    return executeScript(scriptPath, commandParams)
       .then(message => completeJob(message))
-      .catch(error => completeJob(undefined, error))
+      .catch(() => completeJob( `Completing job ${jobId} that has error`))
 
   }
 }

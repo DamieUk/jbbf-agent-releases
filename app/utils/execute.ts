@@ -82,21 +82,20 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
       executionPolicy: 'Bypass',
       noProfile: true
     });
-    ps.addCommand(`& "${path}"`)
+    return ps.addCommand(`& "${path}"`)
       // @ts-ignore
-      .then(() => allParams.length && ps.addParameters(allParams))
-      .then(() => {
-        return ps.invoke()
-          .then((response: any) => {
-            const message = JSON.stringify(response);
-            logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
-            resolve(message);
-          })
-          .catch((err: any) => {
-            logger.info(`Command ->>> ${command} -<<< Failed execution. -----`, err)
-            reject(err);
-            ps.dispose();
-          });
+      .then(() => allParams.length ? ps.addParameters(allParams) : ps)
+      .then(() => ps.invoke())
+      .then((response: any) => {
+        const message = JSON.stringify(response);
+        logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
+        resolve(message);
+        return response;
+      })
+      .catch((err) => {
+        logger.error(`Command ->>> ${command} -<<< Failed execution`);
+        reject(err)
+        return ps.dispose();
       })
   })
 }
