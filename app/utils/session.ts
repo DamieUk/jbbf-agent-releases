@@ -1,4 +1,7 @@
 import {IAnyShape, ISession} from "global-shapes";
+import {IAppEnvironments} from "env-enums";
+
+type Envs = IAppEnvironments | IAnyShape
 
 class AgentSessionInstance {
   public session: ISession = {
@@ -7,7 +10,7 @@ class AgentSessionInstance {
     expiresIn: 1000000000
   };
 
-  public envs: IAnyShape = {};
+  public envs: Envs = {};
 
   public setSession = (session: ISession) => {
     this.session = {
@@ -20,14 +23,14 @@ class AgentSessionInstance {
     return this.session;
   }
 
-  public setEnvs = (envs: IAnyShape) => {
+  public setEnvs = (envs: Envs) => {
     this.envs = {
       ...this.envs,
       ...envs
     }
   }
 
-  public getEnvs = () => {
+  public getEnvs = (): Envs => {
     return this.envs;
   }
 }

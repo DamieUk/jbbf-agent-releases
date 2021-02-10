@@ -33,12 +33,12 @@ const Fetch = (source: REQUEST_SOURCE, method: string) => (_url: string, _option
     };
 
     const url = `${URL_PATHS[source]}${_url}`;
-    logger.log(`Fetching ${url} ... ${options.data ? `data -> ${JSON.stringify(options.data)}` : ''}`);
+    logger.info(`Fetching ${url} ... ${options.data ? `data -> ${JSON.stringify(options.data)}` : ''}`);
     const headers = {...DEFAULT_HEADERS, ...options.headers};
 
     const onError = (err: string) => {
       reject(err);
-      logger.error(`Error on requesting ${method} ${url}`);
+      logger.info(`Error on requesting ${method} ${url}`);
     }
 
     switch (method) {

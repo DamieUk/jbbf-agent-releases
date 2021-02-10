@@ -1,5 +1,4 @@
 import path from 'path';
-import fs from 'fs';
 import {OS_TYPE} from 'os-enums';
 import generateKeys from '../utils/generatePubKey';
 import {getHomePath, PROJECT_LOGS_PATH, PROJECT_PATH, PROGRAM_DATA_PATH} from '../enums';
@@ -32,6 +31,7 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
       PFX: pfxKeyPath,
     },
     SCRIPTS_EXE_FOLDER: path.resolve(PROJECT_PATH, 'execScripts'),
+    LAST_EXEC_SCRIPTS_PATH: path.resolve(PROJECT_PATH, 'lastExecScripts.txt'),
     ENV_FILE_PATH: path.resolve(PROJECT_PATH, 'agentEnvsLocal.txt'),
     SESSION_PATH: path.resolve(PROGRAM_DATA_PATH, 'agentSessions.txt'),
     ...ENV_VARS,
@@ -40,6 +40,7 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
 
   await isFileExist(ALL_ENVS.ENV_FILE_PATH).catch(() => writeFile(`${ALL_ENVS.ENV_FILE_PATH}`, JSON.stringify(ALL_ENVS)));
   await isFileExist(ALL_ENVS.SESSION_PATH).catch(() => writeFile(`${ALL_ENVS.SESSION_PATH}`, ''));
+  await isFileExist(ALL_ENVS.LAST_EXEC_SCRIPTS_PATH).catch(() => writeFile(`${ALL_ENVS.LAST_EXEC_SCRIPTS_PATH}`, ''));
   await mkDir(ALL_ENVS.SCRIPTS_EXE_FOLDER);
   await mkDir(PROJECT_PATH);
 

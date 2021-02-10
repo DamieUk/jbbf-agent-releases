@@ -28,19 +28,6 @@ import logger from './utils/logger';
 import {AgentSession} from "./utils/session";
 import path from "path";
 
-// const appVersion = pac.version;
-
-// let updateTimer: any = null;
-//
-// const AUTO_UPDATE_URL =
-//   'https://api.update.rocks/update/github.com/DamieUk/jbbf-agent-releases/stable/' + process.platform + '/' + appVersion;
-
-// const isOnInstalledApp = process.env.NODE_ENV !== 'development';
-// logger.info(`App is in ${process.env.NODE_ENV} mode`);
-// logger.info(`YAY!! we are on new version ${appVersion}`);
-
-
-
 const createFolders = () => {
   return new Promise((res, rej) => {
     fs.mkdir(PROJECT_PATH, { recursive: true }, (err) => {
@@ -71,7 +58,7 @@ const initWeSockets = async (envs: IAppEnvironments) => {
       secure: false,
     });
 
-    socket.on(SocketEvents.connect, evenCallbacks.onConnect(envs.SOCKET_SERVER_URL));
+    socket.on(SocketEvents.connect, evenCallbacks.onConnect(envs));
     socket.on(SocketEvents.connectError, logger.error);
     socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand(envs));
 
@@ -85,7 +72,7 @@ const initWeSockets = async (envs: IAppEnvironments) => {
 const runApp = async () => {
   if (!isAppRunning) {
 
-    logger.info('Starting app...');
+    logger.info('App is initializing...');
     logger.info(`App Version: ${pac.version}`);
     await createFolders();
 
@@ -106,6 +93,7 @@ const runApp = async () => {
 const app = express();
 
 app.listen(4000,() => {
-  runApp().then(() => logger.info('App is started'));
+  logger.info('App is started')
+  return runApp();
 })
 

@@ -13,21 +13,9 @@ interface IResponse {
   privateKeyPath: string;
 }
 
-//
-// async function savePfxFile(certPemFilePath: string, privateKeyFilePath: string, pfxPath: string) {
-//   const certificatePath = path.resolve(PROJECT_PATH, 'createJBBFCertificateLocal.ps1');
-//   // First load our certificate into a certificate object,
-//   // and then get it as a cert chain object.
-//
-//   return executeScript(certificatePath, { Confirm: false })
-//     .then((res: any) => console.log('Suceess!!!!!! ', res))
-//     .catch((error: any) => console.log('Error!!!!!! ', error))
-// }
-
-
 export default function generateKeys(vmId: string | number): Promise<IResponse> {
   const certificatePath = path.resolve(PROJECT_KEYS_PATH, 'certificate.cert');
-  const pfxKeyPath = path.resolve(PROJECT_KEYS_PATH, 'sharedKey.p12');
+  const pfxKeyPath = path.resolve(PROJECT_KEYS_PATH, 'certContainer.p12');
   const privateKeyPath = path.resolve(PROJECT_KEYS_PATH, 'privateKey.key');
 
   return new Promise((resolve, reject) => {
@@ -57,12 +45,12 @@ export default function generateKeys(vmId: string | number): Promise<IResponse> 
             cert.serialNumber = '01';
             cert.validity.notBefore = new Date();
             cert.validity.notAfter = new Date();
-            cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 5000);
+            cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 20);
 
             const attrs: any[] = [
               {
                 name: "commonName",
-                value: `mv${vmId}.ch`
+                value: `jbbf-mv${vmId}-certificate`
               }
             ];
 
@@ -113,16 +101,10 @@ export default function generateKeys(vmId: string | number): Promise<IResponse> 
               )
 
             AgentSession.setEnvs({
-              privateKey: pems.privateKey
-                .replace('-----BEGIN RSA PRIVATE KEY-----', '')
-                .replace('-----END RSA PRIVATE KEY-----', '')
-                .replace(/(\r\n|\n|\r)/gm, ''),
-              publicKey: pems.cert
-                .replace('-----BEGIN CERTIFICATE-----', '')
-                .replace('-----END CERTIFICATE-----', '')
-                .replace(/(\r\n|\n|\r)/gm, ''),
+              privateKey: pems.privateKey,
+              certificate: pems.cert,
             });
-            // await savePfxFile(certificatePath, privateKeyPath, pfxKeyPath);
+
             const p12Asn1 = pkcs12.toPkcs12Asn1(
               keys.privateKey, cert, '',
               {algorithm: '3des'});
@@ -133,9 +115,12 @@ export default function generateKeys(vmId: string | number): Promise<IResponse> 
               .catch(err => logger.error(`Error while creating p12 file --->>> `, err)))
 
           } catch (e) {
-            reject(e);
+            reject(`Error while generating private and certificate: ${e.toString()}`);
           }
+        } else {
+          reject('Vm id is not found.')
         }
+
 
         resolve({
           keysDirPath: PROJECT_KEYS_PATH,

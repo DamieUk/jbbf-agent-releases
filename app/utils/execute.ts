@@ -79,23 +79,24 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
     logger.info(`Executing script ->>>> ${command}`);
 
     const ps = new Shell({
+      verbose: false,
       executionPolicy: 'Bypass',
       noProfile: true
     });
+
     return ps.addCommand(`& "${path}"`)
       // @ts-ignore
       .then(() => allParams.length ? ps.addParameters(allParams) : ps)
       .then(() => ps.invoke())
-      .then((response: any) => {
-        const message = JSON.stringify(response);
+      .then((response) => {
         logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
-        resolve(message);
+        resolve(response);
         return response;
       })
       .catch((err) => {
-        logger.error(`Command ->>> ${command} -<<< Failed execution`);
+        logger.info(`Command ->>> ${command} -<<< Failed execution: `, err);
         reject(err)
-        return ps.dispose();
+        return ps.dispose().then(() => 'PowerShell process finished. Exited.');
       })
   })
 }
