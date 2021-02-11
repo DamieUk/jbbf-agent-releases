@@ -16,14 +16,18 @@ export const readFile = (path: string): Promise<string> => new Promise((res, rej
 });
 
 export const writeFile = (path: string, data: any, options?: WriteFileOptions): Promise<typeof  data> => new Promise((res, rej) => {
-  fs.writeFile(path, data, options || {}, (err) => {
-    if (err) {
-      rej(err);
-      return logger.error(`Could not create file "${path}"`, err);
-    }
-    res(data);
-    logger.info(`File "${path}" has been successfully created`);
-  })
+  try {
+    fs.writeFile(path, data, options || { encoding: 'ascii'}, (err) => {
+      if (err) {
+        rej(err);
+        return logger.error(`Could not create file "${path}"`, err);
+      }
+      res(data);
+      logger.info(`File "${path}" has been successfully created`);
+    })
+  } catch (e) {
+    return logger.error(`Could not create file "${path}"`, e);
+  }
 });
 
 export const mkDir = (path: string): Promise<boolean> => new Promise((res) => {

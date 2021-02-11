@@ -5,14 +5,14 @@ import {request} from "../utils/request";
 import {downloadScript, executeScript} from "../utils/execute";
 import {IAppEnvironments} from "env-enums";
 import path from "path";
-import {readFile, writeFile} from "../utils/files";
+import {readFile} from "../utils/files";
 import {AgentSession} from "../utils/session";
 
 const getAllActiveScripts = (): Promise<IExecutedScriptsData[]> =>
   readFile(AgentSession.getEnvs().LAST_EXEC_SCRIPTS_PATH).then(res => {
     const scripts: IExecutedScriptsData[] = JSON.parse(res || '[]');
     return scripts;
-  });
+  }).catch(() => logger.error('Could not read last active script'));
 
 export const executeNotCompletedScripts = async () => {
   const scripts: IExecutedScriptsData[] = await getAllActiveScripts();
@@ -74,30 +74,32 @@ const completeJob = async (script: IExecutedScriptsData, message: any, error?: a
   } catch (er) {
     logger.error(`Failed to complete job - ${script.jobId}. -> `, er);
   }
-  await removeActiveScript(script)
+  // await removeActiveScript(script)
   return removeSavedScriptFile(script.path);
 }
 
-const setActiveScript = async (envs: IAppEnvironments, script: IExecutedScriptsData) => {
-  const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
-  const isAlreadyExecuting = !!activeScripts.find(s => s.commandName === script.commandName);
-  if (!isAlreadyExecuting) {
-    activeScripts.push(script);
-    return writeFile(envs.LAST_EXEC_SCRIPTS_PATH, activeScripts)
-  }
-  return activeScripts;
-}
+// const setActiveScript = async (envs: IAppEnvironments, script: IExecutedScriptsData) => {
+//   const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
+//   const isAlreadyExecuting = !!activeScripts.find(s => s.commandName === script.commandName);
+//   if (!isAlreadyExecuting) {
+//     activeScripts.push(script);
+//     return writeFile(envs.LAST_EXEC_SCRIPTS_PATH, JSON.stringify(activeScripts))
+//       .catch((er) => logger.error('Could not write last ecxec script data: ', er))
+//   }
+//   return activeScripts;
+// }
 
 
-const removeActiveScript = async (script: IExecutedScriptsData) => {
-  const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
-  const newScripts = activeScripts.filter(s => s.commandName !== script.commandName);
-
-  if (activeScripts.length > newScripts.length) {
-    return writeFile(AgentSession.getEnvs().LAST_EXEC_SCRIPTS_PATH, newScripts)
-  }
-  return activeScripts;
-}
+// const removeActiveScript = async (script: IExecutedScriptsData) => {
+//   const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
+//   const newScripts = activeScripts.filter(s => s.commandName !== script.commandName);
+//
+//   if (activeScripts.length > newScripts.length) {
+//     return writeFile(AgentSession.getEnvs().LAST_EXEC_SCRIPTS_PATH, JSON.stringify(newScripts))
+//       .catch((er) => logger.error('Could not update last ecxec script data: ', er))
+//   }
+//   return activeScripts;
+// }
 
 const exeScriptCmd = (script: IExecutedScriptsData) => {
   return executeScript(script.path, script.params)
@@ -144,10 +146,10 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
       genId: customScriptId,
       status: 'active',
       path: scriptPath,
-      requiresReboot: scriptData.requiresReboot
-    }
+      requiresReboot: !!scriptData.requiresReboot
+    };
 
-    await setActiveScript(envs, currentScript);
+    // await setActiveScript(envs, currentScript);
 
     return exeScriptCmd(currentScript)
   }
