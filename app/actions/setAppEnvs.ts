@@ -4,9 +4,9 @@ import {readFile} from "../utils/files";
 
 export default async function setAppEnvs(envs: IAppEnvironments) {
   AgentSession.setEnvs(envs);
-  await readFile(envs.AUTH_KEYS_PATH.CERT).then((publicKey: string) =>
+  await readFile(envs.AUTH_KEYS_PATH.CERT).then((certificate: string) =>
     AgentSession.setEnvs({
-      publicKey: publicKey,
+      certificate,
     })
   ).catch(() => 'No certificate file found');
 }
