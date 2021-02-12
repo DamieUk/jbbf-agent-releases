@@ -36,7 +36,7 @@ const registerApp = async (envs: IAppEnvironments) => {
       await writeFile(envs.SESSION_PATH, JSON.stringify(res));
       logger.info('Session is recorded');
       return res;
-    }).catch(() => logger.info('VM is already authorized'))
+    }).catch((er) => logger.info('VM is already authorized of has error: ', er))
   }
   return;
 }

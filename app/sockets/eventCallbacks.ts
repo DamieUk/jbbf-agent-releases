@@ -8,34 +8,6 @@ import path from "path";
 import {readFile, writeFile} from "../utils/files";
 import {AgentSession} from "../utils/session";
 
-const getAllActiveScripts = (): Promise<IExecutedScriptsData[]> =>
-  readFile(AgentSession.getEnvs().LAST_EXEC_SCRIPTS_PATH).then(res => {
-    const scripts: IExecutedScriptsData[] = JSON.parse(res || '[]');
-    return scripts;
-  }).catch(() => logger.error('Could not read last active script'));
-
-export const executeNotCompletedScripts = async () => {
-  const scripts: IExecutedScriptsData[] = await getAllActiveScripts();
-  if (scripts.length) {
-
-    return Promise.all(scripts.map(s => exeScriptCmd(s))).catch(err => {
-      logger.error(`Couldn't not execute all active scripts: `, err);
-    })
-  } else {
-    logger.info('No active scripts found. Continuing...');
-    return ;
-  }
-}
-
-export function onConnect(envs: IAppEnvironments) {
-  return () => {
-    logger.info(
-      `Websocket: Connect ->>>> Successfully connected to websocket server ${envs.SOCKET_SERVER_URL}!`
-    );
-    return executeNotCompletedScripts()
-  }
-}
-
 interface ICommand {
   jobId: number;
   commandName: string;
@@ -50,6 +22,21 @@ interface IExecutedScriptsData {
   commandName: string;
   status: 'active' | 'inactive';
   jobId: string | number;
+}
+
+const getAllRebootingScripts = (): Promise<IExecutedScriptsData[]> =>
+  readFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH).then(res => {
+    const scripts: IExecutedScriptsData[] = JSON.parse(res || '[]');
+    return scripts;
+  }).catch(() => logger.error('Could not read last active script'));
+
+export function onConnect(envs: IAppEnvironments) {
+  return () => {
+    logger.info(
+      `Websocket: Connect ->>>> Successfully connected to websocket server ${envs.SOCKET_SERVER_URL}!`
+    );
+    return completeJobsAfterReboot();
+  }
 }
 
 function generateId(): string {
@@ -74,31 +61,37 @@ const completeJob = async (script: IExecutedScriptsData, message: any, error?: a
   } catch (er) {
     logger.error(`Failed to complete job - ${script.jobId}. -> `, er);
   }
-  await removeActiveScript(script)
-  return removeSavedScriptFile(script.path);
 }
 
-const setActiveScript = async (envs: IAppEnvironments, script: IExecutedScriptsData) => {
-  const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
-  const isAlreadyExecuting = !!activeScripts.find(s => s.commandName === script.commandName);
-  if (!isAlreadyExecuting) {
-    activeScripts.push(script);
-    return writeFile(envs.LAST_EXEC_SCRIPTS_PATH, JSON.stringify(activeScripts))
-      .catch((er) => logger.error('Could not write last ecxec script data: ', er))
+const setRebootingScript = async (envs: IAppEnvironments, script: IExecutedScriptsData) => {
+  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
+  if (script.requiresReboot) {
+    scripts.push(script);
+    return writeFile(envs.REBOOT_SCRIPTS_PATH, JSON.stringify(scripts))
+      .catch((er) => logger.error('Could not write last reboot-script data: ', er))
   }
-  return activeScripts;
+  return scripts;
 }
 
 
-const removeActiveScript = async (script: IExecutedScriptsData) => {
-  const activeScripts: IExecutedScriptsData[] = await getAllActiveScripts();
-  const newScripts = activeScripts.filter(s => s.commandName !== script.commandName);
+const removeRebootScript = async (script: IExecutedScriptsData) => {
+  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
+  const newScripts = scripts.filter(s => s.commandName !== script.commandName);
 
-  if (activeScripts.length > newScripts.length) {
-    return writeFile(AgentSession.getEnvs().LAST_EXEC_SCRIPTS_PATH, JSON.stringify(newScripts))
-      .catch((er) => logger.error('Could not update last ecxec script data: ', er))
+  if (scripts.length !== newScripts.length) {
+    return writeFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH, JSON.stringify(newScripts))
+      .catch((er) => logger.error('Could not update last reboot-script data: ', er))
   }
-  return activeScripts;
+  return scripts;
+}
+
+const completeJobsAfterReboot = async () => {
+  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
+  await Promise.all(scripts.map(s =>
+    completeJob(s, `Completed script "${s.commandName}" after rebooting.`)
+      .then(() => removeRebootScript(s))
+  ))
+    .catch(err => logger.error('Could complete all reboot-scripts: ', err))
 }
 
 const exeScriptCmd = (script: IExecutedScriptsData) => {
@@ -149,7 +142,7 @@ export function onRunCommand<E extends IAppEnvironments>(envs: E) {
       requiresReboot: !!scriptData.requiresReboot
     };
 
-    await setActiveScript(envs, currentScript);
+    await setRebootingScript(envs, currentScript);
 
     return exeScriptCmd(currentScript)
   }
