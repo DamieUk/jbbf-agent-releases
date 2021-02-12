@@ -10,6 +10,7 @@ import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
 import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
 import { mkDir, writeFile, isFileExist } from './utils/files';
+import { ServerHealthCheckService } from './utils/healthCheck';
 
 const createFolders = async () => {
   await mkDir(PROJECT_PATH);
@@ -18,26 +19,29 @@ const createFolders = async () => {
   return isFileExist(PROJECT_LOGS_MAIN_PATH).catch(() => writeFile(PROJECT_LOGS_MAIN_PATH, ''))
 }
 
-let isAppRunning = false;
-
 const runApp = async () => {
-  if (!isAppRunning) {
+  logger.info('App is initializing...');
+  logger.info(`App Version: ${pac.version}`);
+  await createFolders();
 
-    logger.info('App is initializing...');
-    logger.info(`App Version: ${pac.version}`);
-    await createFolders();
+  const ENV_VARS = await InitApp(CurrentOS);
 
-    const ENV_VARS = await InitApp(CurrentOS);
+  logger.info(ENV_VARS);
 
-    logger.info(ENV_VARS);
+  await setAppEnvs(ENV_VARS);
 
-    await setAppEnvs(ENV_VARS);
+  const healthCheckService = new ServerHealthCheckService();
+  const healthCheckUrl = ENV_VARS.API_SERVER_URL + '/api/v1/health-check';
+  const pollingInterval = 10000; /* 10 sec */
+  const pollingAttempts = 100;
+  try {
+    await healthCheckService.waitUntilServerReady(healthCheckUrl, pollingInterval, pollingAttempts);
+    logger.info(ENV_VARS.API_SERVER_URL, ' server is ready');
     await registerAgentWithVMWare(ENV_VARS);
+  } catch (e) {
+    logger.error('Server is unavailable ->> ', e);
+    throw new Error('Server unavailable');
   }
-
-
-  isAppRunning = true;
-  return isAppRunning;
 };
 
 const app = express();
