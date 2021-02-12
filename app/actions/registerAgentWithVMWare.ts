@@ -2,6 +2,7 @@ import {IAppEnvironments} from "env-enums";
 import {request} from "../utils/request";
 import {AgentSession} from "../utils/session";
 import logger from "../utils/logger";
+import socket from "../sockets/socket";
 import {isFileExist, readFile, writeFile} from "../utils/files";
 import {ISession} from "global-shapes";
 
@@ -13,8 +14,10 @@ const registerApp = async (envs: IAppEnvironments) => {
 
   if (isSessionCreated) {
     await readFile(envs.SESSION_PATH).then(session => {
-      logger.info('Session is found. VM is already authorized')
-      return AgentSession.setSession(JSON.parse(session))
+      logger.info('Session is found. VM is already authorized');
+      const ses = JSON.parse(session);
+      socket.initSocket(envs, ses.accessToken)
+      return AgentSession.setSession(ses)
     })
   }
 
@@ -28,6 +31,7 @@ const registerApp = async (envs: IAppEnvironments) => {
         ).toString('base64')
       }
     }).then(async (res: ISession) => {
+      socket.initSocket(envs, res.accessToken)
       AgentSession.setSession(res);
       await writeFile(envs.SESSION_PATH, JSON.stringify(res));
       logger.info('Session is recorded');

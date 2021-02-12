@@ -1,11 +1,8 @@
 // @ts-ignore
 import { createSimpleLogger } from 'simple-node-logger';
-import { PROJECT_LOGS_PATH } from '../enums';
-import path from 'path';
+import { PROJECT_LOGS_MAIN_PATH } from '../enums';
 
-const LOGS_PATH = (path.resolve(PROJECT_LOGS_PATH, 'main.log'));
-
-const logger = createSimpleLogger(LOGS_PATH)
-logger.info(`Logs are placed in "${LOGS_PATH}"`);
+const logger = createSimpleLogger(PROJECT_LOGS_MAIN_PATH)
+logger.info(`Logs are placed in "${PROJECT_LOGS_MAIN_PATH}"`);
 
 export default logger;

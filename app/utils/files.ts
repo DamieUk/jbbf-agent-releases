@@ -20,7 +20,7 @@ export const writeFile = (path: string, data: any, options?: WriteFileOptions): 
     fs.writeFile(path, data, options || { encoding: 'ascii'}, (err) => {
       if (err) {
         rej(err);
-        return logger.error(`Could not create file "${path}"`, err);
+       throw err;
       }
       res(data);
       logger.info(`File "${path}" has been successfully created`);

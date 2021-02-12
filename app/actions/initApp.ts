@@ -1,9 +1,10 @@
 import path from 'path';
 import {OS_TYPE} from 'os-enums';
 import generateKeys from '../utils/generatePubKey';
-import {getHomePath, PROJECT_LOGS_PATH, PROJECT_PATH, PROGRAM_DATA_PATH} from '../enums';
+import {PROJECT_LOGS_PATH, PROJECT_PATH, PROGRAM_DATA_PATH} from '../enums';
 import {pullEnvVarsFromVMTools, setEnvVars} from "../utils/setEnvVars";
 import {isFileExist, writeFile, mkDir} from "../utils/files";
+import getHomePath from "../utils/getHomePath";
 import {IAppEnvironments} from "env-enums";
 import {productName} from "../package.json";
 
