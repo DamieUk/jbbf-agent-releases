@@ -56,7 +56,7 @@ const completeJob = async (script: IExecutedScriptsData, message: any, error?: a
   try {
     await request.apiServer.POST(
       `/agent-jobs/${script.jobId}/complete`,
-      {data: error ? { error: { message: error, stacktrace: '' } } : { data: { message } }}
+      {data:  { data: { message, errorMessage: error || null } }}
     );
   } catch (er) {
     logger.error(`Failed to complete job - ${script.jobId}. -> `, er);
@@ -96,8 +96,18 @@ const completeJobsAfterReboot = async () => {
 
 const exeScriptCmd = (script: IExecutedScriptsData) => {
   return executeScript(script.path, script.params)
-    .then(message => completeJob(script, message))
-    .catch(() => completeJob(script, `Completing job ${script.jobId} that has error`))
+    .then(message => {
+      if (!script.requiresReboot) {
+        return completeJob(script, message)
+      }
+      return undefined;
+    })
+    .catch((err) => {
+      if (!script.requiresReboot) {
+        return completeJob(script, `Completing job ${script.jobId} that has error`, err)
+      }
+      return undefined;
+    })
 }
 
 export function onRunCommand<E extends IAppEnvironments>(envs: E) {
