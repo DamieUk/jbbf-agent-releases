@@ -24,11 +24,15 @@ interface IExecutedScriptsData {
   jobId: string | number;
 }
 
-const getAllRebootingScripts = (): Promise<IExecutedScriptsData[]> =>
+interface IActiveRebootShape { requiresReboot: IExecutedScriptsData[], activeScripts: IExecutedScriptsData[] }
+
+  const INITIAL_REBOOT_ACTIVE_SHAPE: IActiveRebootShape = { requiresReboot: [], activeScripts: [] }
+
+const getAllActiveScripts = (): Promise<IActiveRebootShape> =>
   readFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH).then(res => {
-    const scripts: IExecutedScriptsData[] = JSON.parse(res || '[]');
+    const scripts: IActiveRebootShape = JSON.parse(res || JSON.stringify(INITIAL_REBOOT_ACTIVE_SHAPE));
     return scripts;
-  }).catch(() => logger.error('Could not read last active script'));
+  }).catch(() => logger.error('Could not read last reboot script'));
 
 export function onConnect(envs: IAppEnvironments) {
   return () => {
@@ -61,37 +65,69 @@ const completeJob = async (script: IExecutedScriptsData, message: any, error?: a
   } catch (er) {
     logger.error(`Failed to complete job - ${script.jobId}. -> `, er);
   }
+  await removeRebootActiveScripts(undefined, script);
+  await removeSavedScriptFile(script.path)
 }
 
-const setRebootingScript = async (envs: IAppEnvironments, script: IExecutedScriptsData) => {
-  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
-  if (script.requiresReboot) {
-    scripts.push(script);
-    return writeFile(envs.REBOOT_SCRIPTS_PATH, JSON.stringify(scripts))
-      .catch((er) => logger.error('Could not write last reboot-script data: ', er))
+const writeRebootActiveScripts = async (
+  envs: IAppEnvironments,
+  rebootScript?: IExecutedScriptsData,
+  activeScript?: IExecutedScriptsData
+) => {
+  const allScripts = await getAllActiveScripts();
+  const newData = allScripts;
+
+  if (rebootScript && rebootScript.requiresReboot) {
+    newData.requiresReboot.push(rebootScript);
   }
-  return scripts;
+
+  if (activeScript) {
+    newData.activeScripts.push(activeScript);
+  }
+
+  return writeFile(envs.REBOOT_SCRIPTS_PATH, JSON.stringify(newData))
+    .catch((er) => logger.error('Could not write last reboot-script data: ', er))
 }
 
+const removeRebootActiveScripts = async (
+  rebootScript?: IExecutedScriptsData,
+  activeScript?: IExecutedScriptsData
+) => {
+  const allScripts = await getAllActiveScripts();
 
-const removeRebootScript = async (script: IExecutedScriptsData) => {
-  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
-  const newScripts = scripts.filter(s => s.commandName !== script.commandName);
+  let newRebootScripts = allScripts.requiresReboot;
 
-  if (scripts.length !== newScripts.length) {
-    return writeFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH, JSON.stringify(newScripts))
-      .catch((er) => logger.error('Could not update last reboot-script data: ', er))
+  if (rebootScript) {
+    // @ts-ignore
+    newRebootScripts = newRebootScripts.filter(s => s.commandName !== rebootScript.commandName)
   }
-  return scripts;
+
+  let newActiveScripts = allScripts.activeScripts;
+
+  if (activeScript) {
+    // @ts-ignore
+    newActiveScripts = newActiveScripts.filter(s => s.commandName !== activeScript.commandName)
+  }
+
+  const newData = {
+    requiresReboot: newRebootScripts,
+    activeScripts: newActiveScripts,
+  };
+
+  return writeFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH, JSON.stringify(newData))
+    .catch((er) => logger.error('Could not update last reboot-active-script data: ', er))
 }
 
 const completeJobsAfterReboot = async () => {
-  const scripts: IExecutedScriptsData[] = await getAllRebootingScripts();
-  await Promise.all(scripts.map(s =>
+  const { activeScripts, requiresReboot } = await getAllActiveScripts();
+  await Promise.all(requiresReboot.map(s =>
     completeJob(s, `Completed script "${s.commandName}" after rebooting.`)
-      .then(() => removeRebootScript(s))
+      .then(() => removeRebootActiveScripts(s))
   ))
-    .catch(err => logger.error('Could complete all reboot-scripts: ', err))
+    .catch(err => logger.error('Could complete all reboot-scripts: ', err));
+
+  await Promise.all(activeScripts.map(s => exeScriptCmd(s)))
+    .catch(err => logger.error('Could complete all active-scripts: ', err))
 }
 
 const exeScriptCmd = (script: IExecutedScriptsData) => {
@@ -110,50 +146,52 @@ const exeScriptCmd = (script: IExecutedScriptsData) => {
     })
 }
 
-export function onRunCommand<E extends IAppEnvironments>(envs: E) {
-  return async function <P extends ICommand>(event: P) {
-    const {jobId, commandName, commandParams} = event;
-    let scriptData = null;
-    const customScriptId = generateId();
-    try {
-      const script = await request.scripts.GET(`/scripts/agent/${commandName}`);
-      scriptData = script.data;
-      scriptData.genId = customScriptId;
-    } catch (e) {
-      logger.error(`${commandName} couldn't be found is storage. Script execution is stopped.`);
-      return ;
-    }
+export async function onRunCommand<E extends IAppEnvironments, P extends ICommand>(envs: E, event: P) {
+  const {jobId, commandName, commandParams} = event;
+  let scriptData = null;
+  const customScriptId = generateId();
+  try {
+    const script = await request.scripts.GET(`/scripts/agent/${commandName}`);
+    scriptData = script.data;
+    scriptData.genId = customScriptId;
+  } catch (e) {
+    logger.error(`${commandName} couldn't be found is storage. Script execution is stopped.`, e);
+    return ;
+  }
 
-    const scriptPath: string = await downloadScript(
-      envs.SCRIPT_SERVER_URL + scriptData.filePath,
-      path.resolve(envs.SCRIPTS_EXE_FOLDER, `${scriptData.genId}_${scriptData.fileName}`)
+  const scriptPath: string = await downloadScript(
+    envs.SCRIPT_SERVER_URL + scriptData.filePath,
+    path.resolve(envs.SCRIPTS_EXE_FOLDER, `${scriptData.genId}_${scriptData.fileName}`)
+  );
+
+  if (!scriptPath) {
+    logger.error(`${scriptData.fileName} couldn't be found in agent. Script execution is stopped.`);
+    return null;
+  }
+
+  const isJobMovedToReceived = await request.apiServer.POST(`/agent-jobs/${jobId}/receive`);
+
+  if (!isJobMovedToReceived) {
+    logger.error(`JobId - ${jobId} -> is completed already or has error.`);
+    await removeSavedScriptFile(scriptPath);
+    return null;
+  }
+
+  const currentScript: IExecutedScriptsData = {
+    commandName: commandName,
+    params: commandParams,
+    jobId,
+    genId: customScriptId,
+    status: 'active',
+    path: scriptPath,
+    requiresReboot: !!scriptData.requiresReboot
+  };
+
+  await writeRebootActiveScripts(
+    envs,
+    currentScript.requiresReboot ? currentScript : undefined,
+    currentScript,
     );
 
-    if (!scriptPath) {
-      logger.error(`${scriptData.fileName} couldn't be found in agent. Script execution is stopped.`);
-      return null;
-    }
-
-    const isJobMovedToReceived = await request.apiServer.POST(`/agent-jobs/${jobId}/receive`);
-
-    if (!isJobMovedToReceived) {
-      logger.error(`JobId - ${jobId} -> is completed already or has error.`);
-      await removeSavedScriptFile(scriptPath);
-      return null;
-    }
-
-    const currentScript: IExecutedScriptsData = {
-      commandName: commandName,
-      params: commandParams,
-      jobId,
-      genId: customScriptId,
-      status: 'active',
-      path: scriptPath,
-      requiresReboot: !!scriptData.requiresReboot
-    };
-
-    await setRebootingScript(envs, currentScript);
-
-    return exeScriptCmd(currentScript)
-  }
+  return exeScriptCmd(currentScript)
 }

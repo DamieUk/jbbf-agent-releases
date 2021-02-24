@@ -14,8 +14,6 @@ class SocketInstance {
       const socketUrl = `${envs.SOCKET_SERVER_URL}?accessToken=${token}`;
       this.socket = io(socketUrl, {
         transports: ['websocket'],
-        rejectUnauthorized: false,
-        secure: false,
       });
       if (this.socket) {
         // @ts-ignore
@@ -23,7 +21,7 @@ class SocketInstance {
         // @ts-ignore
         this.socket.on(SocketEvents.connectError, logger.error);
         // @ts-ignore
-        this.socket.on(SocketEvents.runCommand, evenCallbacks.onRunCommand(envs));
+        this.socket.on(SocketEvents.runCommand, (ev) => evenCallbacks.onRunCommand(envs, ev));
       }
       return this.socket;
     } else {

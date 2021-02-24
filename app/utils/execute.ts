@@ -5,6 +5,7 @@ import {IAnyShape} from "global-shapes";
 import Shell from "node-powershell";
 import fs from "fs";
 import http from "http";
+import https from "https";
 
 /**
  * @param {string} command A shell command to execute
@@ -109,7 +110,8 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
 export const downloadScript = (url: string, dest: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
-    http.get(url, (response) => {
+    const client = url.includes('https://') ? https : http
+    client.get(url, (response) => {
       response.pipe(file);
       file.on('finish', () => {
         file.close();  // close() is async, call cb after close completes.

@@ -14,7 +14,7 @@ const PREFIXES = {
   ANY: ''
 };
 
-const DEFAULT_HEADERS = {
+export const DEFAULT_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Credentials': 'true',
   'Content-Type': 'application/json',
