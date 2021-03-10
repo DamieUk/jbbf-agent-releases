@@ -85,11 +85,6 @@ export function executeScript<S extends string, P extends IAnyShape>(path: S, pa
       noProfile: true
     });
 
-    ps.on('end', (code: string) => {
-      resolve(code);
-      logger.info(`on end event of command ${command}`);
-    })
-
     return ps.addCommand(`& "${path}"`)
       // @ts-ignore
       .then(() => allParams.length ? ps.addParameters(allParams) : ps)

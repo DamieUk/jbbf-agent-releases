@@ -39,11 +39,11 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
     ...DYNAMIC_ENV_VARS,
   };
 
+  await mkDir(ALL_ENVS.SCRIPTS_EXE_FOLDER);
+
   await isFileExist(ALL_ENVS.ENV_FILE_PATH).catch(() => writeFile(`${ALL_ENVS.ENV_FILE_PATH}`, JSON.stringify(ALL_ENVS)));
   await isFileExist(ALL_ENVS.SESSION_PATH).catch(() => writeFile(`${ALL_ENVS.SESSION_PATH}`, ''));
   await isFileExist(ALL_ENVS.REBOOT_SCRIPTS_PATH).catch(() => writeFile(`${ALL_ENVS.REBOOT_SCRIPTS_PATH}`, ''));
-  await mkDir(ALL_ENVS.SCRIPTS_EXE_FOLDER);
-  await mkDir(PROJECT_PATH);
 
   return ALL_ENVS;
 }

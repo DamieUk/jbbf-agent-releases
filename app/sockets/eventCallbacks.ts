@@ -28,11 +28,19 @@ interface IActiveRebootShape { requiresReboot: IExecutedScriptsData[], activeScr
 
   const INITIAL_REBOOT_ACTIVE_SHAPE: IActiveRebootShape = { requiresReboot: [], activeScripts: [] }
 
-const getAllActiveScripts = (): Promise<IActiveRebootShape> =>
-  readFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH).then(res => {
-    const scripts: IActiveRebootShape = JSON.parse(res || JSON.stringify(INITIAL_REBOOT_ACTIVE_SHAPE));
-    return scripts;
-  }).catch(() => logger.error('Could not read last reboot script'));
+const getAllActiveScripts = async (): Promise<IActiveRebootShape> => {
+  let scripts: IActiveRebootShape = INITIAL_REBOOT_ACTIVE_SHAPE;
+  try {
+    await readFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH).then(res => {
+      if (res) scripts = JSON.parse(res);
+    })
+  } catch (e) {
+    logger.error('Could not read last reboot script');
+    await writeFile(AgentSession.getEnvs().REBOOT_SCRIPTS_PATH, JSON.stringify(scripts))
+  }
+  return scripts
+}
+
 
 export function onConnect(envs: IAppEnvironments) {
   return () => {
