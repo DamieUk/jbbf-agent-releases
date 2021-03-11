@@ -46,7 +46,7 @@ const initUpdater = (): IAnyFunc => {
   });
 
   autoupdater.on('download.progress', (name: string, perc: string) => {
-    process.stdout.write(name + " - Downloading " + perc + "% \033[0G");
+    process.stdout.write(name + " - Downloading " + perc + "%");
   });
 
   autoupdater.on('download.end', (name: string) => {
