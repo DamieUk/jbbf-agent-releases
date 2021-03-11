@@ -38,6 +38,10 @@
     "test-e2e-live": "node -r @babel/register ./internals/scripts/CheckBuildsExist.js && cross-env NODE_ENV=test testcafe --live electron:./app ./test/e2e/HomePage.e2e.ts",
     "test-watch": "yarn test --watch"
   },
+  "auto-updater":{
+    "repo":"/DamieUk/jbbf-agent-releases.git",
+    "branch":"master"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DamieUk/jbbf-agent-releases.git"

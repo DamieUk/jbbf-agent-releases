@@ -1,7 +1,8 @@
+// @ts-ignore
 import AutoUpdater from 'auto-updater';
+import {IAnyFunc} from "global-shapes";
 
-
-const initUpdater = () => {
+const initUpdater = (): IAnyFunc => {
   const autoupdater = new AutoUpdater({
     pathToJson: '',
     autoupdate: true,
@@ -64,9 +65,9 @@ const initUpdater = () => {
     console.error(name, e);
   });
 
-  return () => {
-    const timer = setInterval(() => autoupdater.fire('check'), 30000)
+  return (): IAnyFunc => {
     // Start checking
+    const timer = setInterval(() => autoupdater.fire('check'), 30 * 10000) // 30 sec
     return () => clearInterval(timer);
   }
 }

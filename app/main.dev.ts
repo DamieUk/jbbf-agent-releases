@@ -9,6 +9,7 @@ import {CurrentOS, PROJECT_PATH, PROJECT_LOGS_PATH, PROJECT_LOGS_MAIN_PATH, PROG
 import InitApp from './actions/initApp';
 import setAppEnvs from './actions/setAppEnvs';
 import registerAgentWithVMWare from "./actions/registerAgentWithVMWare";
+import launchAutoUpdater from "./actions/launchAutoUpdater";
 import { mkDir, writeFile, isFileExist } from './utils/files';
 import { ServerHealthCheckService } from './utils/healthCheck';
 
@@ -34,12 +35,14 @@ const runApp = async () => {
   const healthCheckUrl = ENV_VARS.API_SERVER_URL + '/api/v1/health-check';
   const pollingInterval = 10000; /* 10 sec */
   const pollingAttempts = 100;
+  const stopCheckingLaunchAutoUpdater = launchAutoUpdater();
   try {
     await healthCheckService.waitUntilServerReady(healthCheckUrl, pollingInterval, pollingAttempts);
     logger.info(ENV_VARS.API_SERVER_URL, ' server is ready');
     await registerAgentWithVMWare(ENV_VARS);
   } catch (e) {
     logger.error('Server is unavailable ->> ', e);
+    stopCheckingLaunchAutoUpdater();
     throw new Error('Server unavailable');
   }
 };
