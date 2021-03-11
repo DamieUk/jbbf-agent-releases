@@ -39,7 +39,7 @@
     "test-watch": "yarn test --watch"
   },
   "auto-updater":{
-    "repo":"/DamieUk/jbbf-agent-releases.git",
+    "repo":"/DamieUk/agent-test.git",
     "branch":"master"
   },
   "repository": {
