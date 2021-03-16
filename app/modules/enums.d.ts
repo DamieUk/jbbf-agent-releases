@@ -3,11 +3,15 @@ declare module 'os-enums' {
 }
 
 declare module 'env-enums' {
+  export type ENV_TYPES = 'prod' | 'dev' | 'test' | 'stage' | 'local';
+
   export interface IDynamicEnvVars {
     AGENT_TOKEN: string | null;
     API_SERVER_URL: string | null;
     SCRIPT_SERVER_URL: string | null;
     SOCKET_SERVER_URL: string | null;
+    FILE_STORAGE_SERVER_URL: string | null;
+    ENV: ENV_TYPES | null;
     VM_ID: string | null;
   }
 

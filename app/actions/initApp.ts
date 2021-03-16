@@ -16,7 +16,7 @@ export default async function initApp<O extends OS_TYPE>(os: O): Promise<IAppEnv
   const DYNAMIC_ENV_VARS = await pullEnvVarsFromVMTools();
   const {privateKeyPath, certificatePath, pfxKeyPath, keysDirPath} = await generateKeys(DYNAMIC_ENV_VARS.VM_ID || '');
 
-  const ALL_ENVS:IAppEnvironments = {
+  const ALL_ENVS: IAppEnvironments = {
     HOME,
     APP_NAME: appName,
     LOGS: {

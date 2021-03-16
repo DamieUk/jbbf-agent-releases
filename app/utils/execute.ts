@@ -1,11 +1,11 @@
-import {exec, execFile} from "child_process";
-import logger from "./logger";
-import {IAnyShape} from "global-shapes";
+import { exec, execFile } from 'child_process';
+import logger from './logger';
+import { IAnyShape } from 'global-shapes';
 // @ts-ignore
-import Shell from "node-powershell";
-import fs from "fs";
-import http from "http";
-import https from "https";
+import Shell from 'node-powershell';
+import fs from 'fs';
+import http from 'http';
+import https from 'https';
 
 /**
  * @param {string} command A shell command to execute
@@ -38,7 +38,10 @@ export function execute<C extends string>(command: C): Promise<string> {
         return;
       }
 
-      logger.info(`Executed command "${command}". Output is -> `, standardOutput)
+      logger.info(
+        `Executed command "${command}". Output is -> `,
+        standardOutput
+      );
 
       resolve(standardOutput);
     });
@@ -51,9 +54,12 @@ export function execute<C extends string>(command: C): Promise<string> {
  * @param {string[]} params List of string arguments.
  * @param {string} path Current working directory of the child process.
  */
-export function executeProgram(filePath: string, params?: any): Promise<string> {
+export function executeProgram(
+  filePath: string,
+  params?: any
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile(filePath, params, {shell: true}, (err: any, data: any) => {
+    execFile(filePath, params, { shell: true }, (err: any, data: any) => {
       if (err) {
         return reject(err);
       }
@@ -62,59 +68,72 @@ export function executeProgram(filePath: string, params?: any): Promise<string> 
   });
 }
 
-export function executeScript<S extends string, P extends IAnyShape>(path: S, params?: P): Promise<any> {
+export function executeScript<S extends string, P extends IAnyShape>(
+  path: S,
+  params?: P
+): Promise<any> {
   return new Promise((resolve, reject) => {
     const allParams: IAnyShape[] = [];
     const paramsInfo: string[] = [];
     const paramsKeys: string[] = params ? Object.keys(params) : [];
     if (paramsKeys.length) {
-      paramsKeys.forEach(key => {
+      paramsKeys.forEach((key) => {
         if (params) {
-          paramsInfo.push(`-${key} ${params[key]}`)
-          allParams.push({name: key, value: params[key]});
+          paramsInfo.push(`-${key} ${params[key]}`);
+          allParams.push({ name: key, value: params[key] });
         }
-      })
+      });
     }
 
-    const command = `${path} ${paramsInfo.join(' ')}`;
-    logger.info(`Executing script ->>>> ${command}`);
+    const scriptPath = `${path} ${paramsInfo.join(' ')}`;
+    logger.info(`Executing script ->>>> ${scriptPath}`);
 
     const ps = new Shell({
       verbose: false,
       executionPolicy: 'Bypass',
-      noProfile: true
+      noProfile: true,
     });
 
-    return ps.addCommand(`& "${path}"`)
-      // @ts-ignore
-      .then(() => allParams.length ? ps.addParameters(allParams) : ps)
-      .then(() => ps.invoke())
-      .then((response: any) => {
-        logger.info(`Command ->>> ${command} -<<< Successfully executed.`)
-        resolve(response);
-        return response;
-      })
-      .catch((err: any) => {
-        logger.info(`Command ->>> ${command} -<<< Failed execution: `, err);
-        reject(err);
-        return ps.dispose().then(() => logger.info('PowerShell process finished. Exited.'));
-      })
-  })
+    return (
+      ps
+        .addCommand(`& "${path}"`)
+        // @ts-ignore
+        .then(() => (allParams.length ? ps.addParameters(allParams) : ps))
+        .then(() => ps.invoke())
+        .then((response: any) => {
+          logger.info(`Command ->>> ${scriptPath} -<<< Successfully executed.`);
+          resolve(response);
+          return response;
+        })
+        .catch((err: any) => {
+          return ps.dispose().then(() => {
+            logger.info(
+              `Failed script execution ->>> ${scriptPath} -<<< Exited powerShell process: `,
+              err
+            );
+            reject(err);
+          });
+        })
+    );
+  });
 }
 
 export const downloadScript = (url: string, dest: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
-    const client = url.includes('https://') ? https : http
-    client.get(url, (response) => {
-      response.pipe(file);
-      file.on('finish', () => {
-        file.close();  // close() is async, call cb after close completes.
-        resolve(dest);
+    const client = url.includes('https://') ? https : http;
+    client
+      .get(url, (response) => {
+        response.pipe(file);
+        file.on('finish', () => {
+          file.close(); // close() is async, call cb after close completes.
+          resolve(dest);
+        });
+      })
+      .on('error', (err) => {
+        // Handle errors
+        fs.unlink(dest, () => reject(err.message)); // Delete the file async. (But we don't check the result)
+        reject(err.message);
       });
-    }).on('error', (err) => { // Handle errors
-      fs.unlink(dest, () => reject(err.message)); // Delete the file async. (But we don't check the result)
-      reject(err.message)
-    });
-  })
+  });
 };
