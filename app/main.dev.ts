@@ -25,21 +25,21 @@ const runApp = async () => {
   logger.info(`App Version: ${pac.version}`);
   await createFolders();
 
-  const ENV_VARS = await InitApp(CurrentOS);
+  // const ENV_VARS = await InitApp(CurrentOS);
 
-  logger.info(ENV_VARS);
-
-  await setAppEnvs(ENV_VARS);
-
-  const healthCheckService = new ServerHealthCheckService();
-  const healthCheckUrl = ENV_VARS.API_SERVER_URL + '/api/v1/health-check';
-  const pollingInterval = 10000; /* 10 sec */
-  const pollingAttempts = 100;
-  const stopCheckingLaunchAutoUpdater = launchAutoUpdater();
+  // logger.info(ENV_VARS);
+  //
+  // await setAppEnvs(ENV_VARS);
+  //
+  // const healthCheckService = new ServerHealthCheckService();
+  // const healthCheckUrl = ENV_VARS.API_SERVER_URL + '/api/v1/health-check';
+  // const pollingInterval = 10000; /* 10 sec */
+  // const pollingAttempts = 100;
+  const stopCheckingLaunchAutoUpdater = await launchAutoUpdater();
   try {
-    await healthCheckService.waitUntilServerReady(healthCheckUrl, pollingInterval, pollingAttempts);
-    logger.info(ENV_VARS.API_SERVER_URL, ' server is ready');
-    await registerAgentWithVMWare(ENV_VARS);
+    // await healthCheckService.waitUntilServerReady(healthCheckUrl, pollingInterval, pollingAttempts);
+    // logger.info(ENV_VARS.API_SERVER_URL, ' server is ready');
+    // await registerAgentWithVMWare(ENV_VARS);
   } catch (e) {
     logger.error('Server is unavailable ->> ', e);
     stopCheckingLaunchAutoUpdater();

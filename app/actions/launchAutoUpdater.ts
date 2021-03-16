@@ -1,78 +1,45 @@
-// @ts-ignore
-import AutoUpdater from 'auto-updater';
-import {IAnyFunc} from "global-shapes";
-import logger from "../utils/logger";
+import path from 'path';
+import { IAnyFunc } from 'global-shapes';
+import logger from '../utils/logger';
+import pac from '../../package.json';
+import { PROJECT_PATH } from '../enums/envVariables';
+import { request } from '../utils/request';
+import { writeFile } from '../utils/files';
+import { executeScript, execute } from '../utils/execute';
 
-const initUpdater = (): IAnyFunc => {
-  const autoupdater = new AutoUpdater({
-    autoupdate: true,
-    checkgit: true,
-    progressDebounce: 0,
-    devmode: process.env.NODE_ENV === 'development'
-  });
-
-  autoupdater.on('git-clone', () => {
-    logger.info("You have a clone of the repository. Use 'git pull' to be up-to-date");
-  });
-
-  autoupdater.on('check.up-to-date', (v: string) => {
-    logger.info("You have the latest version: " + v);
-  });
-
-  autoupdater.on('check.out-dated', (v_old: string, v : string) => {
-    logger.info("Your version is outdated. " + v_old + " of " + v);
-    autoupdater.fire('download-update'); // If autoupdate: false, you'll have to do this manually.
-    // Maybe ask if the'd like to download the update.
-  });
-
-  autoupdater.on('update.downloaded', () => {
-    logger.info("Update downloaded and ready for install");
-    autoupdater.fire('extract'); // If autoupdate: false, you'll have to do this manually.
-  });
-
-  autoupdater.on('update.not-installed', () => {
-    logger.info("The Update was already in your folder! It's read for install");
-    autoupdater.fire('extract'); // If autoupdate: false, you'll have to do this manually.
-  });
-
-  autoupdater.on('update.extracted', () => {
-    logger.info("Update extracted successfully!");
-    logger.warn("RESTART THE APP!");
-  });
-
-  autoupdater.on('download.start', (name: string) => {
-    logger.info("Starting downloading: " + name);
-  });
-
-  autoupdater.on('download.progress', (name: string, perc: string) => {
-    process.stdout.write(name + " - Downloading " + perc + "%");
-  });
-
-  autoupdater.on('download.end', (name: string) => {
-    logger.info("Downloaded " + name);
-  });
-
-  autoupdater.on('download.error', (err: any) => {
-    logger.error("Error when downloading: " + err);
-  });
-
-  autoupdater.on('end', () => {
-    logger.info("The app is ready to");
-  });
-
-  autoupdater.on('error', (name: string, e: any) => {
-    logger.error(name, e);
-  });
-
-  return (): IAnyFunc => {
-    // Start checking
-    const timer = setInterval(() => {
-      logger.info('Checking updates...');
-      autoupdater.fire('check')
-    }, 3 * 10000) // 30 sec
-    return () => clearInterval(timer);
+const requestProject = async (url: string) => {
+  try {
+    const data = await request.any.GET(`https://git.jbbf.ch/api/v4/projects/6/repository/files/${url}?ref=master`, { headers: { 'PRIVATE-TOKEN': 'HNjt2LRoytWFCnHh1AE7' } });
+    return Buffer.from(data.content, 'base64').toString('ascii')
+  } catch (e) {
+    throw e
   }
 }
 
-export default initUpdater();
+const updater = (): IAnyFunc => {
+  // Start checking
+  const timer = setInterval( async () => {
+    logger.info('Checking updates...');
+    try {
+
+      const packageStr = await requestProject('package.json');
+      const _pac = JSON.parse(packageStr);
+      logger.info(_pac.version, ' ', pac.version);
+      if (_pac.version !== pac.version) {
+        const newJsFileContent = await requestProject('main.prod.js');
+        const newJsFilePath = path.resolve(PROJECT_PATH, 'jsToReplace.js');
+        await writeFile(newJsFilePath, newJsFileContent);
+        await execute(`node "${path.resolve(PROJECT_PATH, 'removeWindowsService.js')}"`);
+        await executeScript(`node "${path.resolve(PROJECT_PATH, 'update.ps1')}"`);
+      }
+
+    } catch (er) {
+      logger.error(er);
+    }
+
+  }, 10000); // 30 sec
+  return () => clearInterval(timer);
+};
+
+export default updater;
 
