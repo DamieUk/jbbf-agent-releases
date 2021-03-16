@@ -5,10 +5,8 @@ import logger from "../utils/logger";
 
 const initUpdater = (): IAnyFunc => {
   const autoupdater = new AutoUpdater({
-    pathToJson: '',
     autoupdate: true,
     checkgit: true,
-    contenthost: 'https://github.com',
     progressDebounce: 0,
     devmode: process.env.NODE_ENV === 'development'
   });
@@ -22,7 +20,7 @@ const initUpdater = (): IAnyFunc => {
   });
 
   autoupdater.on('check.out-dated', (v_old: string, v : string) => {
-    logger.warn("Your version is outdated. " + v_old + " of " + v);
+    logger.info("Your version is outdated. " + v_old + " of " + v);
     autoupdater.fire('download-update'); // If autoupdate: false, you'll have to do this manually.
     // Maybe ask if the'd like to download the update.
   });
@@ -68,7 +66,10 @@ const initUpdater = (): IAnyFunc => {
 
   return (): IAnyFunc => {
     // Start checking
-    const timer = setInterval(() => autoupdater.fire('check'), 30 * 10000) // 30 sec
+    const timer = setInterval(() => {
+      logger.info('Checking updates...');
+      autoupdater.fire('check')
+    }, 3 * 10000) // 30 sec
     return () => clearInterval(timer);
   }
 }

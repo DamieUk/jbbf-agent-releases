@@ -39,7 +39,7 @@
     "test-watch": "yarn test --watch"
   },
   "auto-updater":{
-    "repo":"/DamieUk/agent-test.git",
+    "repo":"/DamieUk/agent-test",
     "branch":"master"
   },
   "repository": {
