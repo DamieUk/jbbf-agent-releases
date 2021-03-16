@@ -1,15 +1,56 @@
-variables:
-  VERSION_ID: '0.0.$CI_PIPELINE_ID'
-
 stages:
-  - build
+  - test-build
+  - dev-build
+  - stage-build
 
-build:
-  image: slauta93/electron-builder-win
-  stage: build
-  artifacts:
-    paths:
-      - $CI_PROJECT_DIR/release/*.*
+test-build:
+  stage: test-build
+  variables:
+    NODE_ENV: "test"
   script:
-    - sed "s/0.0.0/${VERSION_ID}/g" package.json > _package.json && mv _package.json package.json
-    - yarn && yarn package-ci
+    - DIST_PATH=$PROJECT_BASE_PATH/agent/builds
+    - BUILD_FILENAME=build.zip
+    - yarn install
+    - yarn build
+    - zip $BUILD_FILENAME main.prod.js package.json app/package.json
+    - mkdir -p $DIST_PATH
+    - cp -f {$BUILD_FILENAME,package.json} $DIST_PATH
+  when: manual
+  only:
+    - merge_requests
+  tags:
+    - agent-test-env
+
+dev-build:
+  stage: dev-build
+  variables:
+    NODE_ENV: "dev"
+  script:
+    - DIST_PATH=$PROJECT_BASE_PATH/agent/builds
+    - BUILD_FILENAME=build.zip
+    - yarn install
+    - yarn build
+    - zip $BUILD_FILENAME main.prod.js package.json app/package.json
+    - mkdir -p $DIST_PATH
+    - cp -f {$BUILD_FILENAME,package.json} $DIST_PATH
+  only:
+    - dev
+  tags:
+    - agent-dev-env
+
+stage-build:
+  stage: stage-build
+  variables:
+    NODE_ENV: "stage"
+  script:
+    - DIST_PATH=$PROJECT_BASE_PATH/agent/builds
+    - BUILD_FILENAME=build.zip
+    - yarn install
+    - yarn build
+    - zip $BUILD_FILENAME main.prod.js package.json app/package.json
+    - mkdir -p $DIST_PATH
+    - cp -f {$BUILD_FILENAME,package.json} $DIST_PATH
+  only:
+    - stage
+  tags:
+    - agent-stage-env
