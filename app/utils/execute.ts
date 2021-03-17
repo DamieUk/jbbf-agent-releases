@@ -56,12 +56,16 @@ export function execute<C extends string>(command: C): Promise<string> {
  */
 export function executeProgram(
   filePath: string,
-  params?: any
+  params?: any,
+  options?: any
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile(filePath, params, { shell: true }, (err: any, data: any) => {
+    logger.info(`Running exe file ${filePath} ${params.join(' ')}`);
+    return execFile(filePath, params, { shell: true, ...options }, (err: any, data: any) => {
       if (err) {
-        return reject(err);
+        logger.info(`Exe file ${filePath} failed: `, err);
+        reject(err);
+        throw err;
       }
       return resolve(data);
     });
